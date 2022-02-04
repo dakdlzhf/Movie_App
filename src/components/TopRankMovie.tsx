@@ -9,14 +9,6 @@ import { makeImagePath } from "../utils";
 const Slider = styled.div`
   position: relative;
 `;
-const MovieText = styled(motion.div)`
-  font-size: 20px;
-  color: white;
-  margin: 10px auto;
-  font-family: "Black Han Sans", sans-serif;
-  font-weight: bold;
-`;
-
 const Row = styled(motion.div)`
   position: absolute;
   width: 100%;

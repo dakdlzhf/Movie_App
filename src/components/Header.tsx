@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 //styled-components
 const HeaderWrapper = styled(motion.div)`
+  z-index: 100;
   background-color: rgb(225, 177, 44);
   display: flex;
   position: fixed;
@@ -162,12 +163,12 @@ function Header() {
         </Logo>
         <Link to="/">
           <Item variants={itemVariants} whileHover="active">
-            Movie{homeMath?.isExact && <Circle layoutId="circle" /> }
+            Movie{homeMath?.isExact && <Circle layoutId="circle" />}
           </Item>
         </Link>
         <Link to="/tv">
           <Item variants={itemVariants} whileHover="active">
-            Tv{tvMath && <Circle layoutId="circle" /> }
+            Tv{tvMath && <Circle layoutId="circle" />}
           </Item>
         </Link>
       </Col>

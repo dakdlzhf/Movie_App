@@ -1,15 +1,21 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { getPopularMovieFetch, IGetApi } from "../api";
+import {
+  API_KEY,
+  BASE_PATH,
+  getPopularMovieFetch,
+  getTopMovieFetch,
+  IGetApi,
+} from "../api";
 import { makeImagePath } from "../utils";
 import { motion, AnimatePresence } from "framer-motion";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TopRankMovie from "./TopRankMovie";
 import { useHistory, useRouteMatch } from "react-router-dom";
 
 const Wrapper = styled.div`
   background-color: #e1b12c;
-  height: 95vh;
+  height: 200vh;
 `;
 const Banner = styled.div<{ backgroundimage: string }>`
   height: 800px;
@@ -44,11 +50,24 @@ const Slider = styled.div`
   position: relative;
 `;
 const MovieText = styled(motion.div)`
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 30px;
   color: white;
-  margin: 10px auto;
+  margin: 10px 30px;
   font-family: "Black Han Sans", sans-serif;
   font-weight: bold;
+`;
+const SliderButton = styled(motion.div)`
+  width: 100px;
+  height: 30px;
+  border-radius: 20px;
+  font-size: 20px;
+  cursor: pointer;
+  background-color: rgb(25, 42, 86);
+  margin-left: 30px;
+  text-align: center;
 `;
 
 const Row = styled(motion.div)`
@@ -68,14 +87,19 @@ const Col = styled(motion.div)<{ backgroundimage: string }>`
   background-color: blue;
   border-radius: 20px;
 `;
-const SecondSlide = styled.div`
+const SecondSlide = styled(motion.div)`
   position: absolute;
   width: 100%;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, 1fr);
+  margin-bottom: 5px;
   top: 350px;
 `;
-
-//Variants
-
+const SecondTextWrapper = styled.div`
+  position: absolute;
+  top: 300px;
+`;
 const DirButton1 = styled(motion.div)`
   width: 50px;
   height: 50px;
@@ -113,10 +137,29 @@ const DirButton2 = styled(motion.div)`
   padding-bottom: 8px;
 `;
 
+//Variants
+
+const buttonVariants = {
+  initial: {
+    opacity: 1,
+  },
+  active: {
+    opacity: [0, 1, 0],
+    transition: {
+      type: "tween",
+      repeat: Infinity,
+      duration: 2,
+    },
+  },
+};
+
 function Movie() {
   const { data, isLoading } = useQuery<IGetApi>("api", getPopularMovieFetch);
+  const [secondData, setSecondData] = useState<IGetApi>();
   const [index, setIndex] = useState(0);
+  const [secondIndex, setSecondIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
+  const [secondLeaving, setSecondLeaving] = useState(false);
   const history = useHistory();
   const offset = 5;
   const onClick = (objectId: number) => {
@@ -131,8 +174,20 @@ function Movie() {
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
+  const secondincreaseIndex = () => {
+    if (secondData) {
+      if (secondLeaving) return;
+      setSecondLeaving(true);
+      const indexLength = secondData.results.length;
+      const maxIndex = Math.floor(indexLength / offset) - 1;
+      setSecondIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+    }
+  };
   const toggleLeaving = () => {
     setLeaving((prev) => !prev);
+  };
+  const secondToggleLeaving = () => {
+    setSecondLeaving((prev) => !prev);
   };
   const rowVariants = {
     hidden: {
@@ -142,21 +197,50 @@ function Movie() {
       x: 0,
     },
     exit: {
-      x: -window.outerWidth + 10,
+      x: -window.outerWidth - 10,
     },
   };
+  const secondRowVariants = {
+    hidden: {
+      x: -window.outerWidth - 10,
+    },
+    visible: {
+      x: 0,
+    },
+    exit: {
+      x: +window.outerWidth + 10,
+    },
+  };
+  useEffect(() => {
+    const getTopMovieFetch = () => {
+      return fetch(
+        `${BASE_PATH}/movie/top_rated?api_key=${API_KEY}&append_to_response=videos,images`
+      ).then((res) => res.json());
+    };
+    getTopMovieFetch().then((res) => {
+      setSecondData(res);
+    });
+  }, []);
+  console.log(secondData);
   return (
     <Wrapper>
       <Banner
-        onClick={increaseIndex}
-        backgroundimage={makeImagePath(data?.results[17].poster_path || "")}
+        backgroundimage={makeImagePath(data?.results[2].poster_path||"" )}
       >
         {isLoading ? <Loder>😑Loding...</Loder> : null}
-        <Title>{data?.results[17].title}</Title>
-        <Overview>{data?.results[17].overview}</Overview>
+        <Title>{data?.results[2].title}</Title>
+        <Overview>{data?.results[2].overview}</Overview>
       </Banner>
       <MovieText>
         <h3>인기작품</h3>
+        <SliderButton
+          onClick={increaseIndex}
+          variants={buttonVariants}
+          initial="initial"
+          animate="active"
+        >
+          <p>Next ✔</p>
+        </SliderButton>
       </MovieText>
       <Slider>
         <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
@@ -180,10 +264,42 @@ function Movie() {
           </Row>
         </AnimatePresence>
       </Slider>
+
+
       <Slider>
-        <SecondSlide>
-          <TopRankMovie />
-        </SecondSlide>
+        <SecondTextWrapper>
+          <MovieText>
+            <h3>Best20 명작</h3>
+            <SliderButton
+              onClick={secondincreaseIndex}
+              variants={buttonVariants}
+              initial="initial"
+              animate="active"
+            >
+              <p>Next ✔</p>
+            </SliderButton>
+          </MovieText>
+        </SecondTextWrapper>
+        <AnimatePresence initial={false} onExitComplete={secondToggleLeaving}>
+          <SecondSlide
+            variants={secondRowVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ type: "tween", duration: 1 }}
+            key={secondIndex}
+          >
+            {secondData?.results
+              .slice(offset * secondIndex, offset * secondIndex + offset)
+              .map((object) => (
+                <Col
+                  onClick={() => onClick(object.id)}
+                  key={object.id}
+                  backgroundimage={makeImagePath(object.poster_path, "w500")}
+                ></Col>
+              ))}
+          </SecondSlide>
+        </AnimatePresence>
       </Slider>
     </Wrapper>
   );

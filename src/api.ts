@@ -1,5 +1,5 @@
-const API_KEY = "f354ee7cde587f576652e7979db2f24a";
-const BASE_PATH = "https://api.themoviedb.org/3";
+export const API_KEY = "f354ee7cde587f576652e7979db2f24a";
+export const BASE_PATH = "https://api.themoviedb.org/3";
 
 
 //interface 
