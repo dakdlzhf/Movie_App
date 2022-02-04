@@ -1,11 +1,16 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { getMovieFetch, IGetApi } from "../api";
+import { getPopularMovieFetch, IGetApi } from "../api";
 import { makeImagePath } from "../utils";
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState } from "react";
-import { relative } from "path/posix";
+import TopRankMovie from "./TopRankMovie";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
+const Wrapper = styled.div`
+  background-color: #e1b12c;
+  height: 95vh;
+`;
 const Banner = styled.div<{ backgroundimage: string }>`
   height: 800px;
   display: flex;
@@ -38,13 +43,20 @@ const Overview = styled.div`
 const Slider = styled.div`
   position: relative;
 `;
+const MovieText = styled(motion.div)`
+  font-size: 20px;
+  color: white;
+  margin: 10px auto;
+  font-family: "Black Han Sans", sans-serif;
+  font-weight: bold;
+`;
 
 const Row = styled(motion.div)`
   position: absolute;
   width: 100%;
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   margin-bottom: 5px;
 `;
 
@@ -54,7 +66,14 @@ const Col = styled(motion.div)<{ backgroundimage: string }>`
   background-size: cover;
   background-image: url(${(props) => props.backgroundimage});
   background-color: blue;
+  border-radius: 20px;
 `;
+const SecondSlide = styled.div`
+  position: absolute;
+  width: 100%;
+  top: 350px;
+`;
+
 //Variants
 
 const DirButton1 = styled(motion.div)`
@@ -95,16 +114,20 @@ const DirButton2 = styled(motion.div)`
 `;
 
 function Movie() {
-  const { data, isLoading } = useQuery<IGetApi>("api", getMovieFetch);
+  const { data, isLoading } = useQuery<IGetApi>("api", getPopularMovieFetch);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
-  const offset = 6;
+  const history = useHistory();
+  const offset = 5;
+  const onClick = (objectId: number) => {
+    history.push(`/detail/${objectId}`);
+  };
   const increaseIndex = () => {
     if (data) {
       if (leaving) return;
       setLeaving(true);
-      const indexLength = data.results.length-1
-      const maxIndex = Math.floor(indexLength / offset)-1;
+      const indexLength = data.results.length;
+      const maxIndex = Math.floor(indexLength / offset) - 1;
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
@@ -123,7 +146,7 @@ function Movie() {
     },
   };
   return (
-    <>
+    <Wrapper>
       <Banner
         onClick={increaseIndex}
         backgroundimage={makeImagePath(data?.results[17].poster_path || "")}
@@ -132,6 +155,9 @@ function Movie() {
         <Title>{data?.results[17].title}</Title>
         <Overview>{data?.results[17].overview}</Overview>
       </Banner>
+      <MovieText>
+        <h3>인기작품</h3>
+      </MovieText>
       <Slider>
         <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
           <Row
@@ -146,6 +172,7 @@ function Movie() {
               .slice(offset * index, offset * index + offset)
               .map((object) => (
                 <Col
+                  onClick={() => onClick(object.id)}
                   key={object.id}
                   backgroundimage={makeImagePath(object.poster_path, "w500")}
                 ></Col>
@@ -153,7 +180,12 @@ function Movie() {
           </Row>
         </AnimatePresence>
       </Slider>
-    </>
+      <Slider>
+        <SecondSlide>
+          <TopRankMovie />
+        </SecondSlide>
+      </Slider>
+    </Wrapper>
   );
 }
 
