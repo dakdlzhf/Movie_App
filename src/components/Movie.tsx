@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ReactPlayer from "react-player";
+import { setTimeout } from "timers/promises";
 
 const Wrapper = styled.div`
   background-color: #e1b12c;
@@ -234,8 +235,7 @@ function Movie() {
   const [videoValue, setVideoValue] = useState<IVideo>();
   const history = useHistory();
   const offset = 5;
-  /* console.log(clickedMovieId);
-  console.log(videoValue); */
+  
   const onClick = async (objectId: number) => {
     const getVideoApi = async () => {
       return await fetch(
@@ -245,9 +245,10 @@ function Movie() {
     await getVideoApi().then((res) => {
       setVideoValue(res);
     });
-    console.log(videoValue?.videos.results[0].key);
-
     history.push(`/detail/${objectId}`);
+     window.setTimeout(function () {
+      history.push(`/detail/${objectId}`);
+    }, 500);
   };
   const detailMath =
     currentUrl?.params.id &&
@@ -363,7 +364,7 @@ function Movie() {
             <DetailWrapperFixed onClick={toggleDetail} />
             <DetailInnerAbsolute>
               <ReactPlayer
-                url="https://www.youtube.com/embed/KlyknsTJk0w"
+                url={`https://www.youtube.com/embed/${videoValue?.videos.results[0].key}`}
                 playing={true}
                 loop={true}
                 controls={true}
