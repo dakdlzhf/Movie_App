@@ -4,8 +4,6 @@ import {
   API_KEY,
   BASE_PATH,
   getPopularMovieFetch,
-  getTopMovieFetch,
-  getViedoFetch,
   IGetApi,
   IVideo,
 } from "../api";
@@ -14,7 +12,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ReactPlayer from "react-player";
-import { setTimeout } from "timers/promises";
 
 const Wrapper = styled.div`
   background-color: #e1b12c;
@@ -235,7 +232,6 @@ function Movie() {
   const [videoValue, setVideoValue] = useState<IVideo>();
   const history = useHistory();
   const offset = 5;
-  
   const onClick = async (objectId: number) => {
     const getVideoApi = async () => {
       return await fetch(
@@ -372,20 +368,22 @@ function Movie() {
                 width="100%"
                 height="500px"
               />
-              {detailMath && (
-                <>
+              
+              {videoValue && (
+                  <>
                   <DetailOverview>
-                    <div>{"영화제목 : " + detailMath.title}</div>
-                    {detailMath.overview}
+                    <div>{"영화제목 : " + videoValue.title}</div>
+                    {videoValue?.overview}
                   </DetailOverview>
                   <DetailReleaseDate>
-                    {"영화개봉일 : " + detailMath.release_date}
+                    {"영화개봉일 : " + videoValue.release_date}
                   </DetailReleaseDate>
                   <DetailGrade>
-                    {"영화평점 : " + detailMath.vote_average}
+                    {"영화평점 : " + videoValue.vote_average}
                   </DetailGrade>
-                </>
-              )}
+                  </>
+
+                )}
             </DetailInnerAbsolute>
           </>
         ) : null}
