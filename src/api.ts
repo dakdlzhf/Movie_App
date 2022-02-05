@@ -11,8 +11,20 @@ interface IResults{
     title:string;
     release_date:string;
     vote_average:number;
-
-
+}
+interface IvideoValue{
+    key:string;
+}
+export interface IVideo{
+    id:number;
+    poster_path:string;
+    overview:string;
+    title:string;
+    release_date:string;
+    vote_average:number;
+    videos:{
+        results:IvideoValue[];
+    }
 }
 export interface IGetApi  {
     results:IResults[]
@@ -24,6 +36,10 @@ export function getPopularMovieFetch(){
 }
 export function getTopMovieFetch(){
     return fetch(`${BASE_PATH}/movie/top_rated?api_key=${API_KEY}&append_to_response=videos,images`)
+    .then((res)=>res.json())
+}
+export function getViedoFetch(){
+    return fetch(`${BASE_PATH}/movie/739413?api_key=${API_KEY}&append_to_response=videos,images`)
     .then((res)=>res.json())
 }
 

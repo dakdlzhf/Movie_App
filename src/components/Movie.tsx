@@ -5,17 +5,19 @@ import {
   BASE_PATH,
   getPopularMovieFetch,
   getTopMovieFetch,
+  getViedoFetch,
   IGetApi,
+  IVideo,
 } from "../api";
 import { makeImagePath } from "../utils";
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import TopRankMovie from "./TopRankMovie";
 import { useHistory, useRouteMatch } from "react-router-dom";
+import ReactPlayer from "react-player";
 
 const Wrapper = styled.div`
   background-color: #e1b12c;
-  height: 200vh;
+  height: 150vh;
 `;
 const Banner = styled.div<{ backgroundimage: string }>`
   height: 800px;
@@ -86,6 +88,12 @@ const Col = styled(motion.div)<{ backgroundimage: string }>`
   background-image: url(${(props) => props.backgroundimage});
   background-color: blue;
   border-radius: 20px;
+  &:first-child {
+    transform-origin: center left;
+  }
+  &:last-child {
+    transform-origin: center right;
+  }
 `;
 const SecondSlide = styled(motion.div)`
   position: absolute;
@@ -136,6 +144,54 @@ const DirButton2 = styled(motion.div)`
   text-align: center;
   padding-bottom: 8px;
 `;
+const DetailWrapperFixed = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0.5;
+  z-index: 100;
+`;
+const DetailInnerAbsolute = styled(motion.div)`
+  position: absolute;
+  width: 50%;
+  top: 300px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  border-radius: 20px;
+  background-color: white;
+  overflow: hidden;
+  z-index: 100;
+`;
+const DetailOverview = styled.div`
+  width: 100%;
+  background-color: #3c40c6;
+  text-align: center;
+  padding: 20px;
+  font-family: "Black Han Sans", sans-serif;
+  font-size: 20px;
+  div {
+    margin: 10px;
+    font-size: 1rem;
+    font-family: "Black Han Sans", sans-serif;
+    color: yellow;
+  }
+`;
+
+const DetailReleaseDate = styled.div`
+  width: 100%;
+  padding: 20px;
+  background-color: #0fbcf9;
+  text-align: center;
+`;
+const DetailGrade = styled.div`
+  width: 100%;
+  padding: 20px;
+  background-color: #ff3f34;
+  text-align: center;
+`;
 
 //Variants
 
@@ -152,6 +208,20 @@ const buttonVariants = {
     },
   },
 };
+const colVariants = {
+  normal: {
+    scale: 1,
+  },
+  hover: {
+    scale: 1.3,
+    y: -50,
+    transition: {
+      delay: 0.5,
+      duration: 0.3,
+      type: "tween",
+    },
+  },
+};
 
 function Movie() {
   const { data, isLoading } = useQuery<IGetApi>("api", getPopularMovieFetch);
@@ -160,11 +230,28 @@ function Movie() {
   const [secondIndex, setSecondIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [secondLeaving, setSecondLeaving] = useState(false);
+  const currentUrl = useRouteMatch<{ id: string }>("/detail/:id");
+  const [videoValue, setVideoValue] = useState<IVideo>();
   const history = useHistory();
   const offset = 5;
-  const onClick = (objectId: number) => {
+  /* console.log(clickedMovieId);
+  console.log(videoValue); */
+  const onClick = async (objectId: number) => {
+    const getVideoApi = async () => {
+      return await fetch(
+        `https://api.themoviedb.org/3/movie/${objectId}?api_key=f354ee7cde587f576652e7979db2f24a&append_to_response=videos,images`
+      ).then((res) => res.json());
+    };
+    await getVideoApi().then((res) => {
+      setVideoValue(res);
+    });
+    console.log(videoValue?.videos.results[0].key);
+
     history.push(`/detail/${objectId}`);
   };
+  const detailMath =
+    currentUrl?.params.id &&
+    data?.results.find((movie) => movie.id === +currentUrl.params.id);
   const increaseIndex = () => {
     if (data) {
       if (leaving) return;
@@ -185,6 +272,9 @@ function Movie() {
   };
   const toggleLeaving = () => {
     setLeaving((prev) => !prev);
+  };
+  const toggleDetail = () => {
+    history.push("/");
   };
   const secondToggleLeaving = () => {
     setSecondLeaving((prev) => !prev);
@@ -221,11 +311,10 @@ function Movie() {
       setSecondData(res);
     });
   }, []);
-  console.log(secondData);
   return (
     <Wrapper>
       <Banner
-        backgroundimage={makeImagePath(data?.results[2].poster_path||"" )}
+        backgroundimage={makeImagePath(data?.results[2].poster_path || "")}
       >
         {isLoading ? <Loder>😑Loding...</Loder> : null}
         <Title>{data?.results[2].title}</Title>
@@ -257,6 +346,9 @@ function Movie() {
               .map((object) => (
                 <Col
                   onClick={() => onClick(object.id)}
+                  variants={colVariants}
+                  initial="nomal"
+                  whileHover="hover"
                   key={object.id}
                   backgroundimage={makeImagePath(object.poster_path, "w500")}
                 ></Col>
@@ -265,6 +357,38 @@ function Movie() {
         </AnimatePresence>
       </Slider>
 
+      <AnimatePresence>
+        {currentUrl?.isExact ? (
+          <>
+            <DetailWrapperFixed onClick={toggleDetail} />
+            <DetailInnerAbsolute>
+              <ReactPlayer
+                url="https://www.youtube.com/embed/KlyknsTJk0w"
+                playing={true}
+                loop={true}
+                controls={true}
+                muted
+                width="100%"
+                height="500px"
+              />
+              {detailMath && (
+                <>
+                  <DetailOverview>
+                    <div>{"영화제목 : " + detailMath.title}</div>
+                    {detailMath.overview}
+                  </DetailOverview>
+                  <DetailReleaseDate>
+                    {"영화개봉일 : " + detailMath.release_date}
+                  </DetailReleaseDate>
+                  <DetailGrade>
+                    {"영화평점 : " + detailMath.vote_average}
+                  </DetailGrade>
+                </>
+              )}
+            </DetailInnerAbsolute>
+          </>
+        ) : null}
+      </AnimatePresence>
 
       <Slider>
         <SecondTextWrapper>
@@ -294,6 +418,9 @@ function Movie() {
               .map((object) => (
                 <Col
                   onClick={() => onClick(object.id)}
+                  variants={colVariants}
+                  initial="nomal"
+                  whileHover="hover"
                   key={object.id}
                   backgroundimage={makeImagePath(object.poster_path, "w500")}
                 ></Col>
