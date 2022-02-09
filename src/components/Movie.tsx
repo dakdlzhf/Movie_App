@@ -236,7 +236,11 @@ function Movie() {
   const [videoValue, setVideoValue] = useState<IVideo>();
   const history = useHistory();
   const offset = 5;
-  const onClick = async (objectId: number) => {
+  const [moreCount,setMoreCount] =useState(3);
+  const moreIncrease = ()=>{
+    setMoreCount((prev)=>prev+2)
+  }
+  const onClick = async (objectId: number) => { /*id값으로 해당 video 요청 로직  ------------------------*/
     const getVideoApi = async () => {
       return await fetch(
         `https://api.themoviedb.org/3/movie/${objectId}?api_key=f354ee7cde587f576652e7979db2f24a&append_to_response=videos,images`
@@ -258,7 +262,11 @@ function Movie() {
   const [test, setTest] = useState<IGetListApi[]>();
   const [btnSwitch, setBtnSwitch] = useState(false);
   const moreToggleBtn = () => {
-    setBtnSwitch((prev) => !prev);
+    if(btnSwitch){
+      moreIncrease();
+    }else{
+      setBtnSwitch((prev) => !prev);
+    }
   };
   const filterTest = test?.filter((val, index, arr) => {
     return (
@@ -267,27 +275,32 @@ function Movie() {
       }) === index
     );
   });
+  const scrollEvent=()=>{
+
+    window.scrollTo({top:0,left:0,behavior:"smooth"});       //안부드럽네. .            
+  }
+  scrollEvent();
   /* const clickedMovie =
       bigMovieMatch?.params.movieId &&
       filterTest?.find((movie) => movie.id === +bigMovieMatch.params.movieId); */
   useEffect(() => {
-    for (var i = 2; i < 11; i++) {
+    for (var i = 2; i < moreCount; i++) {  /* MORE 클릭시 count 증가 더많은정보 가져오는로직  */
       let apiGet1 = () => {
         return fetch(
           `https://api.themoviedb.org/3/movie/popular?api_key=f354ee7cde587f576652e7979db2f24a&language=ko-KR&page=${i}`
         ).then((response) => response.json());
       };
-      apiGet1().then((res) => {
-        testArray.push(...res.results);
+      apiGet1().then((res) => { 
+        testArray.push(...res.results);  
         if (testArray) {
           setTest([...testArray]);
         }
       });
     }
-  }, []);
+  }, [moreCount]); /* count 값이 바뀔때 랜더링되게 조건등록 */
 
   /* --------------------------------------------------------------------------------------------END */
-  const increaseIndex = () => {
+  const increaseIndex = () => {  /* 첫번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
     if (data) {
       if (leaving) return;
       setLeaving(true);
@@ -296,7 +309,7 @@ function Movie() {
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
-  const secondincreaseIndex = () => {
+  const secondincreaseIndex = () => { /* 두번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
     if (secondData) {
       if (secondLeaving) return;
       setSecondLeaving(true);
@@ -314,7 +327,7 @@ function Movie() {
   const secondToggleLeaving = () => { //슬라이드애니메이션이 exit 되었을때 실행되는함수
     setSecondLeaving((prev) => !prev);
   };
-  const rowVariants = {
+  const rowVariants = { /* 첫번째 슬라이드 variants */
     hidden: {
       x: window.outerWidth + 10,
     },
@@ -325,7 +338,7 @@ function Movie() {
       x: -window.outerWidth - 10,
     },
   };
-  const secondRowVariants = {
+  const secondRowVariants = { /* 두번째 슬라이드 variants */
     hidden: {
       x: -window.outerWidth - 10,
     },
