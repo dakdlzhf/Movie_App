@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 //styled-components
 const HeaderWrapper = styled(motion.div)`
   z-index: 100;
-  background-color: rgb(225, 177, 44);
+  background-color: #e1b12c;
   display: flex;
   position: fixed;
   top: 0;

@@ -5,6 +5,7 @@ import {
   BASE_PATH,
   getPopularMovieFetch,
   IGetApi,
+  IGetListApi,
   IVideo,
 } from "../api";
 import { makeImagePath } from "../utils";
@@ -25,7 +26,7 @@ const Banner = styled.div<{ backgroundimage: string }>`
   background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8)),
     url(${(props) => props.backgroundimage});
   background-size: cover;
-  padding: 60px;
+  padding: 40px;
 `;
 const Loder = styled.div`
   height: 20vh;
@@ -41,13 +42,33 @@ const Title = styled.div`
   font-weight: bold;
 `;
 const Overview = styled.div`
-  width: 50%;
-  font-size: 20px;
+  width: 30%;
+  font-size: 15px;
   color: white;
   font-family: "Black Han Sans", sans-serif;
 `;
 const Slider = styled.div`
   position: relative;
+`;
+const MovieList = styled.div`
+  position: relative;
+  width: 100%;
+  top: 670px;
+`;
+const ListMoreBtn = styled(motion.div)`
+  color: white;
+  margin: auto;
+  margin-bottom: 10px;
+  text-align: center;
+  align-items: center;
+  font-family: "Black Han Sans", sans-serif;
+  font-weight: bold;
+  width: 150px;
+  height: 45px;
+  border-radius: 5px;
+  font-size: 30px;
+  cursor: pointer;
+  background-color: rgb(25, 42, 86);
 `;
 const MovieText = styled(motion.div)`
   display: flex;
@@ -106,55 +127,18 @@ const SecondTextWrapper = styled.div`
   position: absolute;
   top: 300px;
 `;
-const DirButton1 = styled(motion.div)`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: none;
-  background-color: black;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 80px;
-  left: 20px;
-  margin: 0 auto;
-  font-size: 30px;
-  padding-bottom: 8px;
-  text-align: center;
-`;
-const DirButton2 = styled(motion.div)`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: none;
-  background-color: black;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 80px;
-  right: 20px;
-  margin: 0 auto;
-  font-size: 30px;
-  text-align: center;
-  padding-bottom: 8px;
-`;
 const DetailWrapperFixed = styled(motion.div)`
   position: fixed;
   top: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  opacity: 0.5;
+  opacity: 1;
   z-index: 100;
 `;
 const DetailInnerAbsolute = styled(motion.div)`
   position: absolute;
   width: 50%;
-  top: 300px;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -177,7 +161,6 @@ const DetailOverview = styled.div`
     color: yellow;
   }
 `;
-
 const DetailReleaseDate = styled.div`
   width: 100%;
   padding: 20px;
@@ -190,8 +173,29 @@ const DetailGrade = styled.div`
   background-color: #ff3f34;
   text-align: center;
 `;
+const ErrorView = styled.div`
+  width: 100%;
+  height:500px;
+  padding:50px;
+  color:white;
+  font-size:40px;
+  text-align:center;
+  background-image:url("https://www.wallpapertip.com/wmimgs/99-996631_alone-sad-cardboard-box.jpg");
+  background-position:center ,center;
+  background-size:cover;
+`;
 
 //Variants
+
+const movieMoreBtnVaraints = {
+  active: {
+    color: "#f4f809",
+    transition: {
+      type: "spring",
+      duration: 1,
+    },
+  },
+};
 
 const buttonVariants = {
   initial: {
@@ -214,7 +218,7 @@ const colVariants = {
     scale: 1.3,
     y: -50,
     transition: {
-      delay: 0.5,
+      delay: 0.3,
       duration: 0.3,
       type: "tween",
     },
@@ -242,13 +246,47 @@ function Movie() {
       setVideoValue(res);
     });
     history.push(`/detail/${objectId}`);
-     window.setTimeout(function () {
+    window.setTimeout(function () {
       history.push(`/detail/${objectId}`);
     }, 500);
   };
-  const detailMath =
+  /* const detailMath =
     currentUrl?.params.id &&
-    data?.results.find((movie) => movie.id === +currentUrl.params.id);
+    data?.results.find((movie) => movie.id === +currentUrl.params.id); */
+  /* List api 요청 -------------------------------------------------------------------------------*/
+  let testArray: IGetListApi[] = [];
+  const [test, setTest] = useState<IGetListApi[]>();
+  const [btnSwitch, setBtnSwitch] = useState(false);
+  const moreToggleBtn = () => {
+    setBtnSwitch((prev) => !prev);
+  };
+  const filterTest = test?.filter((val, index, arr) => {
+    return (
+      arr.findIndex((it) => {
+        return it.id === val.id;
+      }) === index
+    );
+  });
+  /* const clickedMovie =
+      bigMovieMatch?.params.movieId &&
+      filterTest?.find((movie) => movie.id === +bigMovieMatch.params.movieId); */
+  useEffect(() => {
+    for (var i = 2; i < 11; i++) {
+      let apiGet1 = () => {
+        return fetch(
+          `https://api.themoviedb.org/3/movie/popular?api_key=f354ee7cde587f576652e7979db2f24a&language=ko-KR&page=${i}`
+        ).then((response) => response.json());
+      };
+      apiGet1().then((res) => {
+        testArray.push(...res.results);
+        if (testArray) {
+          setTest([...testArray]);
+        }
+      });
+    }
+  }, []);
+
+  /* --------------------------------------------------------------------------------------------END */
   const increaseIndex = () => {
     if (data) {
       if (leaving) return;
@@ -267,13 +305,13 @@ function Movie() {
       setSecondIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
-  const toggleLeaving = () => {
+  const toggleLeaving = () => { //슬라이드애니메이션이 exit 되었을때 실행되는함수
     setLeaving((prev) => !prev);
   };
-  const toggleDetail = () => {
+  const toggleDetail = () => { //detail 화면을클릭하면 메인화면으로 빠져나오는함수
     history.push("/");
   };
-  const secondToggleLeaving = () => {
+  const secondToggleLeaving = () => { //슬라이드애니메이션이 exit 되었을때 실행되는함수
     setSecondLeaving((prev) => !prev);
   };
   const rowVariants = {
@@ -301,7 +339,7 @@ function Movie() {
   useEffect(() => {
     const getTopMovieFetch = () => {
       return fetch(
-        `${BASE_PATH}/movie/top_rated?api_key=${API_KEY}&append_to_response=videos,images`
+        `${BASE_PATH}/movie/upcoming?api_key=${API_KEY}&language=ko-KR&append_to_response=videos,images`
       ).then((res) => res.json());
     };
     getTopMovieFetch().then((res) => {
@@ -311,11 +349,13 @@ function Movie() {
   return (
     <Wrapper>
       <Banner
-        backgroundimage={makeImagePath(data?.results[2].poster_path || "")}
+        backgroundimage={makeImagePath(
+          videoValue?.backdrop_path || data?.results[0].poster_path || ""
+        )}
       >
         {isLoading ? <Loder>😑Loding...</Loder> : null}
-        <Title>{data?.results[2].title}</Title>
-        <Overview>{data?.results[2].overview}</Overview>
+        <Title>{videoValue?.title || data?.results[0].title}</Title>
+        <Overview>{videoValue?.overview || data?.results[0].overview}</Overview>
       </Banner>
       <MovieText>
         <h3>인기작품</h3>
@@ -329,13 +369,13 @@ function Movie() {
         </SliderButton>
       </MovieText>
       <Slider>
-        <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+        <AnimatePresence onExitComplete={toggleLeaving}>
           <Row
             variants={rowVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ type: "tween", duration: 1 }}
+            transition={{ type: "spring", duration: 1 }}
             key={index}
           >
             {data?.results
@@ -358,19 +398,22 @@ function Movie() {
         {currentUrl?.isExact ? (
           <>
             <DetailWrapperFixed onClick={toggleDetail} />
-            <DetailInnerAbsolute>
-              <ReactPlayer
-                url={`https://www.youtube.com/embed/${videoValue?.videos.results[0].key}`}
-                playing={true}
-                loop={true}
-                controls={true}
-                muted
-                width="100%"
-                height="500px"
-              />
+            <DetailInnerAbsolute style={{ top: window.scrollY + 200 }}>
+              {videoValue?.videos?.results[0]?.key ? (
+                <ReactPlayer
+                  url={`https://www.youtube.com/embed/${videoValue?.videos.results[0].key}`}
+                  playing={true}
+                  loop={true}
+                  controls={true}
+                  /* muted */
+                  width="100%"
+                  height="500px"
+                />
+              ) :<ErrorView><h3>비공개처리되었습니다..😭</h3></ErrorView>}
               
+
               {videoValue && (
-                  <>
+                <>
                   <DetailOverview>
                     <div>{"영화제목 : " + videoValue.title}</div>
                     {videoValue?.overview}
@@ -381,9 +424,8 @@ function Movie() {
                   <DetailGrade>
                     {"영화평점 : " + videoValue.vote_average}
                   </DetailGrade>
-                  </>
-
-                )}
+                </>
+              )}
             </DetailInnerAbsolute>
           </>
         ) : null}
@@ -392,7 +434,7 @@ function Movie() {
       <Slider>
         <SecondTextWrapper>
           <MovieText>
-            <h3>Best20 명작</h3>
+            <h3>개봉예정작품</h3>
             <SliderButton
               onClick={secondincreaseIndex}
               variants={buttonVariants}
@@ -403,13 +445,13 @@ function Movie() {
             </SliderButton>
           </MovieText>
         </SecondTextWrapper>
-        <AnimatePresence initial={false} onExitComplete={secondToggleLeaving}>
+        <AnimatePresence onExitComplete={secondToggleLeaving}>
           <SecondSlide
             variants={secondRowVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ type: "tween", duration: 1 }}
+            transition={{ type: "spring", duration: 1 }}
             key={secondIndex}
           >
             {secondData?.results
@@ -427,6 +469,38 @@ function Movie() {
           </SecondSlide>
         </AnimatePresence>
       </Slider>
+
+      <MovieList>
+        <ListMoreBtn
+          variants={movieMoreBtnVaraints}
+          whileHover="active"
+          onClick={moreToggleBtn}
+        >
+          <p>MORE</p>
+        </ListMoreBtn>
+        <AnimatePresence onExitComplete={toggleLeaving}>
+          <Row
+            variants={rowVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ type: "spring", duration: 1 }}
+          >
+            {btnSwitch
+              ? filterTest?.map((object) => (
+                  <Col
+                    onClick={() => onClick(object.id)}
+                    variants={colVariants}
+                    initial="nomal"
+                    whileHover="hover"
+                    key={object.id}
+                    backgroundimage={makeImagePath(object.poster_path, "w500")}
+                  ></Col>
+                ))
+              : null}
+          </Row>
+        </AnimatePresence>
+      </MovieList>
     </Wrapper>
   );
 }
