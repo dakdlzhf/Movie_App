@@ -38,6 +38,7 @@ const Item = styled(motion.div)`
 const Logo = styled(motion.svg)`
   margin-right: 50px;
   width: 120px;
+  min-width:100px;
   height: 70px;
   fill: red;
   path {
@@ -149,6 +150,7 @@ function Header() {
       animate={headerAnimation}
       initial="top"
     >
+    
       <Col>
         <Logo
           variants={logoVariants}

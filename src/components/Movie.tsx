@@ -1,5 +1,6 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
+import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
 import {
   API_KEY,
   BASE_PATH,
@@ -175,18 +176,79 @@ const DetailGrade = styled.div`
 `;
 const ErrorView = styled.div`
   width: 100%;
-  height:500px;
-  padding:50px;
-  color:white;
-  font-size:40px;
-  text-align:center;
-  background-image:url("https://www.wallpapertip.com/wmimgs/99-996631_alone-sad-cardboard-box.jpg");
-  background-position:center ,center;
-  background-size:cover;
+  height: 500px;
+  padding: 50px;
+  color: white;
+  font-size: 40px;
+  text-align: center;
+  background-image: url("https://www.wallpapertip.com/wmimgs/99-996631_alone-sad-cardboard-box.jpg");
+  background-position: center, center;
+  background-size: cover;
 `;
-
+// 스크롤 박스 Up,Down
+const ScrollBoxUp = styled(motion.div)`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-image: url("https://image.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148901163.jpg");
+  background-size: cover;
+  color: white;
+  z-index: 200;
+  cursor: pointer;
+  text-align: center;
+  line-height: 100px;
+  h3 {
+    font-size: 4rem;
+  }
+`;
+const ScrollBoxDown = styled(motion.div)`
+  position: fixed;
+  bottom: 20px;
+  right: 150px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEy1zo32-IA-jqIp-O25fxSyzarItuvzJ3eQ&usqp=CAU");
+  color: white;
+  background-size: contain;
+  z-index: 200;
+  text-align: center;
+  line-height: 100px;
+  h3 {
+    font-size: 4rem;
+  }
+`;
+//더보기 박스
+const MoreBox = styled(motion.div)`
+  z-index: 200;
+  position: fixed;
+  bottom: 20px;
+  right: 260px;
+  width: 150px;
+  height: 100px;
+  line-height: 100px;
+  text-align: center;
+  border-radius: 20px;
+  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEy1zo32-IA-jqIp-O25fxSyzarItuvzJ3eQ&usqp=CAU");
+  color: white;
+  background-size: contain;
+  h3 {
+    font-size: 2.5rem;
+  }
+`;
 //Variants
-
+const scrollVariants = {
+  active: {
+    scale: 0.9,
+    transition: {
+      duration: 1,
+      type: "spring",
+    },
+  },
+};
 const movieMoreBtnVaraints = {
   active: {
     color: "#f4f809",
@@ -236,11 +298,22 @@ function Movie() {
   const [videoValue, setVideoValue] = useState<IVideo>();
   const history = useHistory();
   const offset = 5;
-  const [moreCount,setMoreCount] =useState(3);
-  const moreIncrease = ()=>{
-    setMoreCount((prev)=>prev+2)
-  }
-  const onClick = async (objectId: number) => { /*id값으로 해당 video 요청 로직  ------------------------*/
+  const [moreCount, setMoreCount] = useState(3);
+  /* 스크롤이벤트함수 -------------------------------------*/
+  const topMoveHandler = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  };
+  const BottomMoveHandler = () => {
+    /*  document.body.scrollHeight = 스크롤최종높이 */
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      left: 0,
+      behavior: "smooth",
+    });
+  };
+  /* ----------------------------------스크롤이벤트함수END */
+  const onClick = async (objectId: number) => {
+    /*id값으로 해당 video 요청 로직  ------------------------*/
     const getVideoApi = async () => {
       return await fetch(
         `https://api.themoviedb.org/3/movie/${objectId}?api_key=f354ee7cde587f576652e7979db2f24a&append_to_response=videos,images`
@@ -255,16 +328,22 @@ function Movie() {
     }, 500);
   };
   /* const detailMath =
-    currentUrl?.params.id &&
-    data?.results.find((movie) => movie.id === +currentUrl.params.id); */
+  currentUrl?.params.id &&
+  data?.results.find((movie) => movie.id === +currentUrl.params.id); */
   /* List api 요청 -------------------------------------------------------------------------------*/
   let testArray: IGetListApi[] = [];
   const [test, setTest] = useState<IGetListApi[]>();
   const [btnSwitch, setBtnSwitch] = useState(false);
+  const moreIncrease = () => {
+    /* Count 증가 함수  */
+    setMoreCount((prev) => prev + 2);
+  };
+
   const moreToggleBtn = () => {
-    if(btnSwitch){
+    /* Count 증가함수 호출 && 스위치상태 변경 */
+    if (btnSwitch) {
       moreIncrease();
-    }else{
+    } else {
       setBtnSwitch((prev) => !prev);
     }
   };
@@ -275,23 +354,19 @@ function Movie() {
       }) === index
     );
   });
-  const scrollEvent=()=>{
-
-    window.scrollTo({top:0,left:0,behavior:"smooth"});       //안부드럽네. .            
-  }
-  scrollEvent();
   /* const clickedMovie =
       bigMovieMatch?.params.movieId &&
       filterTest?.find((movie) => movie.id === +bigMovieMatch.params.movieId); */
   useEffect(() => {
-    for (var i = 2; i < moreCount; i++) {  /* MORE 클릭시 count 증가 더많은정보 가져오는로직  */
+    /* MORE 클릭시 count 증가되면서 데이터 가져오는로직  */
+    for (var i = 2; i < moreCount; i++) {
       let apiGet1 = () => {
         return fetch(
           `https://api.themoviedb.org/3/movie/popular?api_key=f354ee7cde587f576652e7979db2f24a&language=ko-KR&page=${i}`
         ).then((response) => response.json());
       };
-      apiGet1().then((res) => { 
-        testArray.push(...res.results);  
+      apiGet1().then((res) => {
+        testArray.push(...res.results);
         if (testArray) {
           setTest([...testArray]);
         }
@@ -300,7 +375,8 @@ function Movie() {
   }, [moreCount]); /* count 값이 바뀔때 랜더링되게 조건등록 */
 
   /* --------------------------------------------------------------------------------------------END */
-  const increaseIndex = () => {  /* 첫번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
+  const increaseIndex = () => {
+    /* 첫번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
     if (data) {
       if (leaving) return;
       setLeaving(true);
@@ -309,7 +385,8 @@ function Movie() {
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
-  const secondincreaseIndex = () => { /* 두번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
+  const secondincreaseIndex = () => {
+    /* 두번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
     if (secondData) {
       if (secondLeaving) return;
       setSecondLeaving(true);
@@ -318,16 +395,20 @@ function Movie() {
       setSecondIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
-  const toggleLeaving = () => { //슬라이드애니메이션이 exit 되었을때 실행되는함수
+  const toggleLeaving = () => {
+    //슬라이드애니메이션이 exit 되었을때 실행되는함수
     setLeaving((prev) => !prev);
   };
-  const toggleDetail = () => { //detail 화면을클릭하면 메인화면으로 빠져나오는함수
+  const toggleDetail = () => {
+    //detail 화면을클릭하면 메인화면으로 빠져나오는함수
     history.push("/");
   };
-  const secondToggleLeaving = () => { //슬라이드애니메이션이 exit 되었을때 실행되는함수
+  const secondToggleLeaving = () => {
+    //슬라이드애니메이션이 exit 되었을때 실행되는함수
     setSecondLeaving((prev) => !prev);
   };
-  const rowVariants = { /* 첫번째 슬라이드 variants */
+  const rowVariants = {
+    /* 첫번째 슬라이드 variants */
     hidden: {
       x: window.outerWidth + 10,
     },
@@ -338,7 +419,8 @@ function Movie() {
       x: -window.outerWidth - 10,
     },
   };
-  const secondRowVariants = { /* 두번째 슬라이드 variants */
+  const secondRowVariants = {
+    /* 두번째 슬라이드 variants */
     hidden: {
       x: -window.outerWidth - 10,
     },
@@ -350,6 +432,7 @@ function Movie() {
     },
   };
   useEffect(() => {
+    /* 두번째슬라이드 데이터 요청 */
     const getTopMovieFetch = () => {
       return fetch(
         `${BASE_PATH}/movie/upcoming?api_key=${API_KEY}&language=ko-KR&append_to_response=videos,images`
@@ -359,8 +442,36 @@ function Movie() {
       setSecondData(res);
     });
   }, []);
+
   return (
     <Wrapper>
+      <ScrollBoxUp
+        variants={scrollVariants}
+        whileHover="active"
+        initial={{ scale: 0.7 }}
+        onClick={topMoveHandler}
+      >
+        <h3>
+          <AiOutlineArrowUp />
+        </h3>
+      </ScrollBoxUp>
+      <ScrollBoxDown
+        variants={scrollVariants}
+        whileHover="active"
+        initial={{ scale: 0.7 }}
+        onClick={BottomMoveHandler}
+      >
+        <h3>
+          <AiOutlineArrowDown />
+        </h3>
+      </ScrollBoxDown>
+      <MoreBox
+        variants={scrollVariants}
+        whileHover="active"
+        initial={{ scale: 0.7 }}
+      >
+        <h3>MORE</h3>
+      </MoreBox>
       <Banner
         backgroundimage={makeImagePath(
           videoValue?.backdrop_path || data?.results[0].poster_path || ""
@@ -422,8 +533,11 @@ function Movie() {
                   width="100%"
                   height="500px"
                 />
-              ) :<ErrorView><h3>비공개처리되었습니다..😭</h3></ErrorView>}
-              
+              ) : (
+                <ErrorView>
+                  <h3>비공개처리되었습니다..😭</h3>
+                </ErrorView>
+              )}
 
               {videoValue && (
                 <>
