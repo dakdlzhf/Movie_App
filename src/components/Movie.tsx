@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
+import { MdAddCircle } from "react-icons/md";
 import {
   API_KEY,
   BASE_PATH,
@@ -10,7 +11,12 @@ import {
   IVideo,
 } from "../api";
 import { makeImagePath } from "../utils";
-import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useViewportScroll,
+  useAnimation,
+} from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ReactPlayer from "react-player";
@@ -60,7 +66,7 @@ const MovieList = styled.div`
 `;
 const ListMoreBtn = styled(motion.div)`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center
   margin-bottom: 10px;
   text-align: center;
@@ -70,15 +76,20 @@ const ListMoreBtn = styled(motion.div)`
   height: 45px;
   border-radius: 5px;
   font-size: 30px;
-  background-color: rgb(25, 42, 86);
 `;
-const ListText = styled(motion.p)`
-  width: 150px;
+const ListText = styled(motion.div)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
   height: 45px;
-  margin-left: 45%;
-  background-color: #e1b12c;
-  border: 1px solid;
+  border-radius: 20px;
+  background-color: white;
   cursor: pointer;
+  div {
+    padding-top: 8px;
+    font-size: 2.5rem;
+  }
 `;
 
 const ListSearch = styled(motion.input)`
@@ -218,7 +229,12 @@ const SearchBox = styled(motion.input)`
   font-size: 30px;
   padding: 10px;
 `;
-const FormWrapper = styled.form``;
+const FormWrapper = styled.form`
+  svg {
+    height: 40px;
+    cursor: pointer;
+  }
+`;
 
 // 스크롤 박스 Up,Down
 const ScrollBoxUp = styled(motion.div)`
@@ -278,7 +294,10 @@ const MoreBox = styled(motion.div)`
 //Variants
 const searchVariants = {
   initial: {
-    scaleX: 0,
+    x: window.innerWidth,
+  },
+  active: {
+    x: 0,
   },
 };
 const scrollVariants = {
@@ -292,10 +311,10 @@ const scrollVariants = {
 };
 const movieMoreBtnVaraints = {
   active: {
-    color: "#f4f809",
+    color: "red",
     transition: {
       type: "spring",
-      duration: 1,
+      duration: 2,
     },
   },
 };
@@ -345,6 +364,20 @@ function Movie() {
   const offset = 5;
   const [isLoading0, setIsLoading0] = useState<boolean>(true);
   const [moreCount, setMoreCount] = useState(3);
+  const inputAnimation = useAnimation();
+  const [searchClick, setSearchClick] = useState(false);
+  const toggleHandle = () => {
+    if (searchClick) {
+      inputAnimation.start({
+        scaleX: 0,
+      });
+    } else {
+      inputAnimation.start({
+        scaleX: 1,
+      });
+    }
+    setSearchClick((prev) => !prev);
+  };
   /* 검색엔진 -------------------------------------------------- */
   const [searchKeyWord, setSearchKeyWord] = useState("");
   const { register, handleSubmit, setValue } = useForm<IForm>();
@@ -718,7 +751,10 @@ function Movie() {
               whileHover="active"
               onClick={moreToggleBtn}
             >
-              MORE
+              영화더보기
+              <div>
+                <MdAddCircle />
+              </div>
             </ListText>
             <select
               defaultValue="영어"
@@ -728,24 +764,37 @@ function Movie() {
               <option value="영어">영어</option>
             </select>
             <FormWrapper onSubmit={handleSubmit(onValid)}>
-              {scrollSwitch ? (
-                <SearchBox
-                  {...register("keyword")}
-                  layoutId="search"
-                  variants={searchVariants}
-                  initial="initial"
-                  animate={{ scaleX: 1 }}
-                  placeholder="Movies Search Here"
-                  onChange={(e) => setSearchKeyWord(e.target.value)}
-                />
-              ) : (
-                <ListSearch
-                  {...register("keyword")}
-                  layoutId="search"
-                  placeholder="Movies Search Here"
-                  onChange={(e) => setSearchKeyWord(e.target.value)}
-                />
-              )}
+              {/* <ListSearch
+                {...register("keyword")}
+                placeholder="Movies Search Here"
+                onChange={(e) => {
+                  e.preventDefault();
+                  setSearchKeyWord(e.target.value);
+                }}
+              /> */}
+              <SearchBox
+                {...register("keyword")}
+                placeholder="Movies Search Here"
+                initial={{ scaleX: 0 }}
+                animate={inputAnimation}
+                transition={{ type: "sping"}}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setSearchKeyWord(e.target.value);
+                }}
+              />
+              <motion.svg
+                onClick={toggleHandle}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                ></path>
+              </motion.svg>
             </FormWrapper>
           </ListMoreBtn>
         </AnimatePresence>
