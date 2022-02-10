@@ -10,7 +10,7 @@ import {
   IVideo,
 } from "../api";
 import { makeImagePath } from "../utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ReactPlayer from "react-player";
@@ -235,6 +235,7 @@ const MoreBox = styled(motion.div)`
   background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEy1zo32-IA-jqIp-O25fxSyzarItuvzJ3eQ&usqp=CAU");
   color: white;
   background-size: contain;
+  cursor: pointer;
   h3 {
     font-size: 2.5rem;
   }
@@ -297,6 +298,7 @@ function Movie() {
   const currentUrl = useRouteMatch<{ id: string }>("/detail/:id");
   const [videoValue, setVideoValue] = useState<IVideo>();
   const history = useHistory();
+  const { scrollY } = useViewportScroll();
   const offset = 5;
   const [moreCount, setMoreCount] = useState(3);
   /* 스크롤이벤트함수 -------------------------------------*/
@@ -334,13 +336,13 @@ function Movie() {
   let testArray: IGetListApi[] = [];
   const [test, setTest] = useState<IGetListApi[]>();
   const [btnSwitch, setBtnSwitch] = useState(false);
+  /* Count 증가 함수  -----------------------------------------------------------------------------*/
   const moreIncrease = () => {
-    /* Count 증가 함수  */
     setMoreCount((prev) => prev + 2);
   };
 
+  /* Count 증가함수 호출 && 스위치상태 변경 ---------------------------------------------------------*/
   const moreToggleBtn = () => {
-    /* Count 증가함수 호출 && 스위치상태 변경 */
     if (btnSwitch) {
       moreIncrease();
     } else {
@@ -357,8 +359,9 @@ function Movie() {
   /* const clickedMovie =
       bigMovieMatch?.params.movieId &&
       filterTest?.find((movie) => movie.id === +bigMovieMatch.params.movieId); */
+
+  /* MORE 클릭시 count 증가되면서 데이터 가져오는로직 -------------------------------------------------*/
   useEffect(() => {
-    /* MORE 클릭시 count 증가되면서 데이터 가져오는로직  */
     for (var i = 2; i < moreCount; i++) {
       let apiGet1 = () => {
         return fetch(
@@ -373,8 +376,6 @@ function Movie() {
       });
     }
   }, [moreCount]); /* count 값이 바뀔때 랜더링되게 조건등록 */
-
-  /* --------------------------------------------------------------------------------------------END */
   const increaseIndex = () => {
     /* 첫번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
     if (data) {
@@ -431,8 +432,8 @@ function Movie() {
       x: +window.outerWidth + 10,
     },
   };
+  /* 두번째슬라이드 데이터 요청 ---------------------------------------------------------------------*/
   useEffect(() => {
-    /* 두번째슬라이드 데이터 요청 */
     const getTopMovieFetch = () => {
       return fetch(
         `${BASE_PATH}/movie/upcoming?api_key=${API_KEY}&language=ko-KR&append_to_response=videos,images`
@@ -443,6 +444,18 @@ function Movie() {
     });
   }, []);
 
+  /* 스크롤 MORE 이벤트 동작 로직 ------------------------------------------------------------------- */
+  const [scrollSwitch, setScrollSwitch] = useState(false);
+  const scrollChange = () => {
+    if (scrollY.get() > 1000) {
+      setScrollSwitch(true);
+    } else {
+      setScrollSwitch(false);
+    }
+  }; 
+  useEffect(() => {
+    window.addEventListener("scroll", scrollChange);
+  }, [scrollSwitch]);
   return (
     <Wrapper>
       <ScrollBoxUp
@@ -465,13 +478,17 @@ function Movie() {
           <AiOutlineArrowDown />
         </h3>
       </ScrollBoxDown>
-      <MoreBox
-        variants={scrollVariants}
-        whileHover="active"
-        initial={{ scale: 0.7 }}
-      >
-        <h3>MORE</h3>
-      </MoreBox>
+      {scrollSwitch ? ( /* 스크롤 값 조건에 따라 버튼이보인다 */
+        <MoreBox
+          onClick={moreToggleBtn}
+          variants={scrollVariants}
+          whileHover="active"
+          initial={{ scale: 0.7 }}
+        >
+          <h3>MORE</h3>
+        </MoreBox>
+      ) : null}
+
       <Banner
         backgroundimage={makeImagePath(
           videoValue?.backdrop_path || data?.results[0].poster_path || ""
