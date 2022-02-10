@@ -24,8 +24,7 @@ import { useForm } from "react-hook-form";
 import _ from "lodash";
 
 const Wrapper = styled.div`
-  background-color: #e1b12c;
-  height: 150vh;
+height:100vh;
 `;
 const Banner = styled.div<{ backgroundimage: string }>`
   height: 800px;
@@ -91,16 +90,6 @@ const ListText = styled(motion.div)`
     font-size: 2.5rem;
   }
 `;
-
-const ListSearch = styled(motion.input)`
-  z-index: 200;
-  margin-right: 30px;
-  width: 300px;
-  height: 45px;
-  border-radius: 20px;
-  font-size: 30px;
-  padding: 10px;
-`;
 const MovieText = styled(motion.div)`
   display: flex;
   align-items: center;
@@ -121,7 +110,10 @@ const SliderButton = styled(motion.div)`
   margin-left: 30px;
   text-align: center;
 `;
-
+const Svg = styled.svg`
+  width: 100px;
+  height: 100px;
+`;
 const Row = styled(motion.div)`
   position: absolute;
   width: 100%;
@@ -221,7 +213,8 @@ const SearchBox = styled(motion.input)`
   position: fixed;
   z-index: 200;
   right: 30px;
-  bottom: 150px;
+  top: 1550px;
+  border:none;
   transform-origin: center right;
   width: 300px;
   height: 50px;
@@ -239,7 +232,7 @@ const FormWrapper = styled.form`
 // 스크롤 박스 Up,Down
 const ScrollBoxUp = styled(motion.div)`
   position: fixed;
-  bottom: 20px;
+  top: 1600px;
   right: 20px;
   width: 100px;
   height: 100px;
@@ -257,7 +250,7 @@ const ScrollBoxUp = styled(motion.div)`
 `;
 const ScrollBoxDown = styled(motion.div)`
   position: fixed;
-  bottom: 20px;
+  top: 1600px;
   right: 150px;
   width: 100px;
   height: 100px;
@@ -292,9 +285,33 @@ const MoreBox = styled(motion.div)`
   }
 `;
 //Variants
+const rowVariants = {
+  /* 첫번째 슬라이드 variants */
+  hidden: {
+    x: window.outerWidth + 10,
+  },
+  visible: {
+    x: 0,
+  },
+  exit: {
+    x: -window.outerWidth - 10,
+  },
+};
+const secondRowVariants = {
+  /* 두번째 슬라이드 variants */
+  hidden: {
+    x: -window.outerWidth - 10,
+  },
+  visible: {
+    x: 0,
+  },
+  exit: {
+    x: +window.outerWidth + 10,
+  },
+};
 const searchVariants = {
   initial: {
-    x: window.innerWidth,
+    x: window.outerWidth,
   },
   active: {
     x: 0,
@@ -505,30 +522,7 @@ function Movie() {
     //슬라이드애니메이션이 exit 되었을때 실행되는함수
     setSecondLeaving((prev) => !prev);
   };
-  const rowVariants = {
-    /* 첫번째 슬라이드 variants */
-    hidden: {
-      x: window.outerWidth + 10,
-    },
-    visible: {
-      x: 0,
-    },
-    exit: {
-      x: -window.outerWidth - 10,
-    },
-  };
-  const secondRowVariants = {
-    /* 두번째 슬라이드 variants */
-    hidden: {
-      x: -window.outerWidth - 10,
-    },
-    visible: {
-      x: 0,
-    },
-    exit: {
-      x: +window.outerWidth + 10,
-    },
-  };
+
   /* 두번째슬라이드 데이터 요청 ---------------------------------------------------------------------*/
   useEffect(() => {
     const getTopMovieFetch = () => {
@@ -777,24 +771,28 @@ function Movie() {
                 placeholder="Movies Search Here"
                 initial={{ scaleX: 0 }}
                 animate={inputAnimation}
-                transition={{ type: "sping"}}
+                transition={{ type: "sping" }}
                 onChange={(e) => {
                   e.preventDefault();
                   setSearchKeyWord(e.target.value);
                 }}
               />
-              <motion.svg
+              <Svg
                 onClick={toggleHandle}
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path
+                <motion.path
+                  initial={{pathLength:0, fill: "rgba(255,255,255,0)" }}
+                  animate={{pathLength:1, fill: "#886288" }}
+                  transition={{default:{duration:3},fill:{duration:0.5,delay:3}}}
                   fillRule="evenodd"
+                  stroke="white"
                   d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
                   clipRule="evenodd"
-                ></path>
-              </motion.svg>
+                ></motion.path>
+              </Svg>
             </FormWrapper>
           </ListMoreBtn>
         </AnimatePresence>

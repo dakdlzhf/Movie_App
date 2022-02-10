@@ -37,6 +37,9 @@ footer, header, hgroup, main, menu, nav, section {
 }
 body {
   line-height: 1;
+  overflow-x: hidden; //가로스크롤바 숨기기
+  overflow-y:hidden;  //세로스크롤바 숨기기 데이터검색할때 콘텐츠들이 생기고 없어질때 흔들림을 없애기위해
+  background-color:black;
 }
 menu, ol, ul {
   list-style: none;
