@@ -11,9 +11,11 @@ import {
 } from "../api";
 import { makeImagePath } from "../utils";
 import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ReactPlayer from "react-player";
+import { useForm } from "react-hook-form";
+import _ from "lodash";
 
 const Wrapper = styled.div`
   background-color: #e1b12c;
@@ -57,19 +59,36 @@ const MovieList = styled.div`
   top: 670px;
 `;
 const ListMoreBtn = styled(motion.div)`
-  color: white;
-  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center
   margin-bottom: 10px;
   text-align: center;
-  align-items: center;
   font-family: "Black Han Sans", sans-serif;
   font-weight: bold;
-  width: 150px;
+  width: 100%;
   height: 45px;
   border-radius: 5px;
   font-size: 30px;
-  cursor: pointer;
   background-color: rgb(25, 42, 86);
+`;
+const ListText = styled(motion.p)`
+  width: 150px;
+  height: 45px;
+  margin-left: 45%;
+  background-color: #e1b12c;
+  border: 1px solid;
+  cursor: pointer;
+`;
+
+const ListSearch = styled(motion.input)`
+  z-index: 200;
+  margin-right: 30px;
+  width: 300px;
+  height: 45px;
+  border-radius: 20px;
+  font-size: 30px;
+  padding: 10px;
 `;
 const MovieText = styled(motion.div)`
   display: flex;
@@ -100,7 +119,6 @@ const Row = styled(motion.div)`
   grid-template-columns: repeat(5, 1fr);
   margin-bottom: 5px;
 `;
-
 const Col = styled(motion.div)<{ backgroundimage: string }>`
   height: 300px;
   background-position: center center;
@@ -128,6 +146,7 @@ const SecondTextWrapper = styled.div`
   position: absolute;
   top: 300px;
 `;
+// 영화콘텐츠 클릭시 커지면서 나오는 디테일 창
 const DetailWrapperFixed = styled(motion.div)`
   position: fixed;
   top: 0;
@@ -174,6 +193,7 @@ const DetailGrade = styled.div`
   background-color: #ff3f34;
   text-align: center;
 `;
+//비디오 예고편이 없는 아이템 에러처리 이미지
 const ErrorView = styled.div`
   width: 100%;
   height: 500px;
@@ -185,6 +205,21 @@ const ErrorView = styled.div`
   background-position: center, center;
   background-size: cover;
 `;
+// 검색 박스
+const SearchBox = styled(motion.input)`
+  position: fixed;
+  z-index: 200;
+  right: 30px;
+  bottom: 150px;
+  transform-origin: center right;
+  width: 300px;
+  height: 50px;
+  border-radius: 20px;
+  font-size: 30px;
+  padding: 10px;
+`;
+const FormWrapper = styled.form``;
+
 // 스크롤 박스 Up,Down
 const ScrollBoxUp = styled(motion.div)`
   position: fixed;
@@ -241,6 +276,11 @@ const MoreBox = styled(motion.div)`
   }
 `;
 //Variants
+const searchVariants = {
+  initial: {
+    scaleX: 0,
+  },
+};
 const scrollVariants = {
   active: {
     scale: 0.9,
@@ -287,7 +327,10 @@ const colVariants = {
     },
   },
 };
-
+//Interface
+interface IForm {
+  keyword: string;
+}
 function Movie() {
   const { data, isLoading } = useQuery<IGetApi>("api", getPopularMovieFetch);
   const [secondData, setSecondData] = useState<IGetApi>();
@@ -300,7 +343,17 @@ function Movie() {
   const history = useHistory();
   const { scrollY } = useViewportScroll();
   const offset = 5;
+  const [isLoading0, setIsLoading0] = useState<boolean>(true);
   const [moreCount, setMoreCount] = useState(3);
+  /* 검색엔진 -------------------------------------------------- */
+  const [searchKeyWord, setSearchKeyWord] = useState("");
+  const { register, handleSubmit, setValue } = useForm<IForm>();
+  const onValid = ({ keyword }: IForm) => {
+    // useForm 으로 input 에서받은데이터 state 에 보내는중
+    setSearchKeyWord(keyword);
+    setValue("keyword", "");
+  };
+
   /* 스크롤이벤트함수 -------------------------------------*/
   const topMoveHandler = () => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
@@ -339,6 +392,7 @@ function Movie() {
   /* Count 증가 함수  -----------------------------------------------------------------------------*/
   const moreIncrease = () => {
     setMoreCount((prev) => prev + 2);
+    setIsLoading0(false);
   };
 
   /* Count 증가함수 호출 && 스위치상태 변경 ---------------------------------------------------------*/
@@ -360,12 +414,22 @@ function Movie() {
       bigMovieMatch?.params.movieId &&
       filterTest?.find((movie) => movie.id === +bigMovieMatch.params.movieId); */
 
-  /* MORE 클릭시 count 증가되면서 데이터 가져오는로직 -------------------------------------------------*/
+  /*select 를이용 언어 변경 로직 */
+  const [language, setLanguage] = useState("");
+  const languageHandler = (e: string) => {
+    if (e === "한국어") {
+      setLanguage("ko-KR");
+    } else {
+      setLanguage("en-US");
+    }
+  };
+
   useEffect(() => {
+    /* MORE 클릭시 count 증가되면서 데이터 가져오는로직 -------------------------------------------------*/
     for (var i = 2; i < moreCount; i++) {
       let apiGet1 = () => {
         return fetch(
-          `https://api.themoviedb.org/3/movie/popular?api_key=f354ee7cde587f576652e7979db2f24a&language=ko-KR&page=${i}`
+          `https://api.themoviedb.org/3/movie/popular?api_key=f354ee7cde587f576652e7979db2f24a&language=${language}&page=${i}`
         ).then((response) => response.json());
       };
       apiGet1().then((res) => {
@@ -375,7 +439,7 @@ function Movie() {
         }
       });
     }
-  }, [moreCount]); /* count 값이 바뀔때 랜더링되게 조건등록 */
+  }, [moreCount, language]); /* count 값이 바뀔때 랜더링되게 조건등록 */
   const increaseIndex = () => {
     /* 첫번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
     if (data) {
@@ -444,7 +508,7 @@ function Movie() {
     });
   }, []);
 
-  /* 스크롤 MORE 이벤트 동작 로직 ------------------------------------------------------------------- */
+  /* 스크롤 이벤트 동작 로직 ------------------------------------------------------------------- */
   const [scrollSwitch, setScrollSwitch] = useState(false);
   const scrollChange = () => {
     if (scrollY.get() > 1000) {
@@ -452,10 +516,42 @@ function Movie() {
     } else {
       setScrollSwitch(false);
     }
-  }; 
+  };
   useEffect(() => {
     window.addEventListener("scroll", scrollChange);
   }, [scrollSwitch]);
+
+  // 스크롤 이벤트가 발생시, throttle 처리
+
+  /* const [onoff,SetOnOff]= useState(false);
+      window.addEventListener("scroll",()=>{
+        if(window.innerHeight+window.scrollY >= document.body.offsetHeight-500){
+          
+          SetOnOff(true);
+        }
+        if(onoff){
+          
+            setTimeout(()=>{
+              moreIncrease();
+              SetOnOff(false)
+            },1000)
+          
+        }
+      }) */
+  /* const lastCardRef = useRef(null); */
+  /* const infiniteScroll =useCallback(()=>{
+
+    if(window.innerHeight+window.scrollY >= document.body.offsetHeight-500){
+      if(isLoading0){
+        moreIncrease()
+      }
+    }
+  },[isLoading0])
+  window.addEventListener('scroll',()=>{
+    
+      infiniteScroll()
+    
+  },true) */
   return (
     <Wrapper>
       <ScrollBoxUp
@@ -478,7 +574,7 @@ function Movie() {
           <AiOutlineArrowDown />
         </h3>
       </ScrollBoxDown>
-      {scrollSwitch ? ( /* 스크롤 값 조건에 따라 버튼이보인다 */
+      {scrollSwitch /* 스크롤 값 조건에 따라 버튼이보인다 */ ? (
         <MoreBox
           onClick={moreToggleBtn}
           variants={scrollVariants}
@@ -615,13 +711,44 @@ function Movie() {
       </Slider>
 
       <MovieList>
-        <ListMoreBtn
-          variants={movieMoreBtnVaraints}
-          whileHover="active"
-          onClick={moreToggleBtn}
-        >
-          <p>MORE</p>
-        </ListMoreBtn>
+        <AnimatePresence>
+          <ListMoreBtn>
+            <ListText
+              variants={movieMoreBtnVaraints}
+              whileHover="active"
+              onClick={moreToggleBtn}
+            >
+              MORE
+            </ListText>
+            <select
+              defaultValue="영어"
+              onChange={(e) => languageHandler(e.target.value)}
+            >
+              <option value="한국어">한국어</option>
+              <option value="영어">영어</option>
+            </select>
+            <FormWrapper onSubmit={handleSubmit(onValid)}>
+              {scrollSwitch ? (
+                <SearchBox
+                  {...register("keyword")}
+                  layoutId="search"
+                  variants={searchVariants}
+                  initial="initial"
+                  animate={{ scaleX: 1 }}
+                  placeholder="Movies Search Here"
+                  onChange={(e) => setSearchKeyWord(e.target.value)}
+                />
+              ) : (
+                <ListSearch
+                  {...register("keyword")}
+                  layoutId="search"
+                  placeholder="Movies Search Here"
+                  onChange={(e) => setSearchKeyWord(e.target.value)}
+                />
+              )}
+            </FormWrapper>
+          </ListMoreBtn>
+        </AnimatePresence>
         <AnimatePresence onExitComplete={toggleLeaving}>
           <Row
             variants={rowVariants}
@@ -631,17 +758,31 @@ function Movie() {
             transition={{ type: "spring", duration: 1 }}
           >
             {btnSwitch
-              ? filterTest?.map((object) => (
-                  <Col
-                    onClick={() => onClick(object.id)}
-                    variants={colVariants}
-                    initial="nomal"
-                    whileHover="hover"
-                    key={object.id}
-                    backgroundimage={makeImagePath(object.poster_path, "w500")}
-                  ></Col>
-                ))
+              ? filterTest
+                  ?.filter((el) => {
+                    if (searchKeyWord) {
+                      return el.title
+                        .toLowerCase()
+                        .includes(searchKeyWord.toLowerCase());
+                    } else {
+                      return el;
+                    }
+                  })
+                  .map((object) => (
+                    <Col
+                      onClick={() => onClick(object.id)}
+                      variants={colVariants}
+                      initial="nomal"
+                      whileHover="hover"
+                      key={object.id}
+                      backgroundimage={makeImagePath(
+                        object.poster_path,
+                        "w500"
+                      )}
+                    ></Col>
+                  ))
               : null}
+            {/* <div ref={lastCardRef} /> */}
           </Row>
         </AnimatePresence>
       </MovieList>
