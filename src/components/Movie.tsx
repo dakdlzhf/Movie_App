@@ -1,3 +1,4 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nanum+Pen+Script&display=swap'); */
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
@@ -17,14 +18,14 @@ import {
   useViewportScroll,
   useAnimation,
 } from "framer-motion";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { useForm } from "react-hook-form";
 import _ from "lodash";
 
 const Wrapper = styled.div`
-height:100vh;
+  height: 100vh;
 `;
 const Banner = styled.div<{ backgroundimage: string }>`
   height: 800px;
@@ -43,17 +44,17 @@ const Loder = styled.div`
   align-items: center;
 `;
 const Title = styled.div`
-  width: 50%;
+  width: 100%;
   font-size: 50px;
   color: yellow;
-  font-family: "Black Han Sans", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: bold;
 `;
 const Overview = styled.div`
   width: 30%;
-  font-size: 15px;
+  font-size: 25px;
   color: white;
-  font-family: "Black Han Sans", sans-serif;
+  font-family: "Montserrat", sans-serif;
 `;
 const Slider = styled.div`
   position: relative;
@@ -69,7 +70,7 @@ const ListMoreBtn = styled(motion.div)`
   align-items: center
   margin-bottom: 10px;
   text-align: center;
-  font-family: "Black Han Sans", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-weight: bold;
   width: 100%;
   height: 45px;
@@ -84,6 +85,7 @@ const ListText = styled(motion.div)`
   height: 45px;
   border-radius: 20px;
   background-color: white;
+  font-family: "Montserrat", sans-serif;
   cursor: pointer;
   div {
     padding-top: 8px;
@@ -97,7 +99,7 @@ const MovieText = styled(motion.div)`
   font-size: 30px;
   color: white;
   margin: 10px 30px;
-  font-family: "Black Han Sans", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: bold;
 `;
 const SliderButton = styled(motion.div)`
@@ -135,6 +137,9 @@ const Col = styled(motion.div)<{ backgroundimage: string }>`
   &:last-child {
     transform-origin: center right;
   }
+`;
+const Br =styled.div`
+  height:20px;
 `;
 const SecondSlide = styled(motion.div)`
   position: absolute;
@@ -213,14 +218,15 @@ const SearchBox = styled(motion.input)`
   position: fixed;
   z-index: 200;
   right: 30px;
-  top: 1550px;
-  border:none;
+  top: 88.5%;
+  border: none;
   transform-origin: center right;
   width: 300px;
   height: 50px;
   border-radius: 20px;
-  font-size: 30px;
-  padding: 10px;
+  font-size: 25px;
+  padding: 20px;
+  font-family: "Montserrat", sans-serif;
 `;
 const FormWrapper = styled.form`
   svg {
@@ -232,7 +238,7 @@ const FormWrapper = styled.form`
 // 스크롤 박스 Up,Down
 const ScrollBoxUp = styled(motion.div)`
   position: fixed;
-  top: 1600px;
+  top: 92%;
   right: 20px;
   width: 100px;
   height: 100px;
@@ -250,7 +256,7 @@ const ScrollBoxUp = styled(motion.div)`
 `;
 const ScrollBoxDown = styled(motion.div)`
   position: fixed;
-  top: 1600px;
+  top: 92%;
   right: 150px;
   width: 100px;
   height: 100px;
@@ -265,11 +271,27 @@ const ScrollBoxDown = styled(motion.div)`
     font-size: 4rem;
   }
 `;
+// Select 박스
+const SelectBox = styled(motion.select)`
+  border: none;
+  border-radius: 10px;
+  width: 10%;
+  text-align: center;
+  font-size: 23px;
+  margin-left: 20px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: bold;
+  option{
+    font-family: "Montserrat", sans-serif;
+    font-size:18px;
+  font-weight: bold;
+  }
+`;
 //더보기 박스
 const MoreBox = styled(motion.div)`
   z-index: 200;
   position: fixed;
-  bottom: 20px;
+  top: 92%;
   right: 260px;
   width: 150px;
   height: 100px;
@@ -307,14 +329,6 @@ const secondRowVariants = {
   },
   exit: {
     x: +window.outerWidth + 10,
-  },
-};
-const searchVariants = {
-  initial: {
-    x: window.outerWidth,
-  },
-  active: {
-    x: 0,
   },
 };
 const scrollVariants = {
@@ -432,19 +446,50 @@ function Movie() {
       history.push(`/detail/${objectId}`);
     }, 500);
   };
-  /* const detailMath =
-  currentUrl?.params.id &&
-  data?.results.find((movie) => movie.id === +currentUrl.params.id); */
   /* List api 요청 -------------------------------------------------------------------------------*/
   let testArray: IGetListApi[] = [];
   const [test, setTest] = useState<IGetListApi[]>();
   const [btnSwitch, setBtnSwitch] = useState(false);
-  /* Count 증가 함수  -----------------------------------------------------------------------------*/
+  const [language, setLanguage] = useState("ko-KR");
+  useEffect(() => { 
+    /* MORE 클릭시 List api 요청 + count 증가 로직 -----------------------------------------------------*/
+    for (var i = 2; i < moreCount; i++) {
+      let apiGet1 = () => {
+        return fetch(
+          `https://api.themoviedb.org/3/movie/popular?api_key=f354ee7cde587f576652e7979db2f24a&language=${language}&page=${i}`
+        ).then((response) => response.json());
+      };
+      apiGet1().then((res) => {
+        testArray.push(...res.results);
+        if (testArray) {
+          setTest([...testArray]);
+        }
+      });
+    }
+  }, [moreCount, language]); /* count 값이 바뀔때 랜더링되게 조건등록 */
+  /*select 를이용 언어 변경 로직 */
+  const languageHandler = (e: string) => {
+    if (e == "Korean") {
+      setLanguage("ko-KR");
+    } else {
+      setLanguage("en-US");
+    }
+  };
   const moreIncrease = () => {
     setMoreCount((prev) => prev + 2);
     setIsLoading0(false);
   };
-
+  /* 두번째슬라이드 api 요청 ---------------------------------------------------------------------*/
+  useEffect(() => {
+    const getTopMovieFetch = () => {
+      return fetch(
+        `${BASE_PATH}/movie/upcoming?api_key=${API_KEY}&language=ko-KR&append_to_response=videos,images`
+      ).then((res) => res.json());
+    };
+    getTopMovieFetch().then((res) => {
+      setSecondData(res);
+    });
+  }, []);
   /* Count 증가함수 호출 && 스위치상태 변경 ---------------------------------------------------------*/
   const moreToggleBtn = () => {
     if (btnSwitch) {
@@ -460,36 +505,9 @@ function Movie() {
       }) === index
     );
   });
-  /* const clickedMovie =
-      bigMovieMatch?.params.movieId &&
-      filterTest?.find((movie) => movie.id === +bigMovieMatch.params.movieId); */
+  
 
-  /*select 를이용 언어 변경 로직 */
-  const [language, setLanguage] = useState("");
-  const languageHandler = (e: string) => {
-    if (e === "한국어") {
-      setLanguage("ko-KR");
-    } else {
-      setLanguage("en-US");
-    }
-  };
-
-  useEffect(() => {
-    /* MORE 클릭시 count 증가되면서 데이터 가져오는로직 -------------------------------------------------*/
-    for (var i = 2; i < moreCount; i++) {
-      let apiGet1 = () => {
-        return fetch(
-          `https://api.themoviedb.org/3/movie/popular?api_key=f354ee7cde587f576652e7979db2f24a&language=${language}&page=${i}`
-        ).then((response) => response.json());
-      };
-      apiGet1().then((res) => {
-        testArray.push(...res.results);
-        if (testArray) {
-          setTest([...testArray]);
-        }
-      });
-    }
-  }, [moreCount, language]); /* count 값이 바뀔때 랜더링되게 조건등록 */
+  
   const increaseIndex = () => {
     /* 첫번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
     if (data) {
@@ -523,18 +541,6 @@ function Movie() {
     setSecondLeaving((prev) => !prev);
   };
 
-  /* 두번째슬라이드 데이터 요청 ---------------------------------------------------------------------*/
-  useEffect(() => {
-    const getTopMovieFetch = () => {
-      return fetch(
-        `${BASE_PATH}/movie/upcoming?api_key=${API_KEY}&language=ko-KR&append_to_response=videos,images`
-      ).then((res) => res.json());
-    };
-    getTopMovieFetch().then((res) => {
-      setSecondData(res);
-    });
-  }, []);
-
   /* 스크롤 이벤트 동작 로직 ------------------------------------------------------------------- */
   const [scrollSwitch, setScrollSwitch] = useState(false);
   const scrollChange = () => {
@@ -548,37 +554,6 @@ function Movie() {
     window.addEventListener("scroll", scrollChange);
   }, [scrollSwitch]);
 
-  // 스크롤 이벤트가 발생시, throttle 처리
-
-  /* const [onoff,SetOnOff]= useState(false);
-      window.addEventListener("scroll",()=>{
-        if(window.innerHeight+window.scrollY >= document.body.offsetHeight-500){
-          
-          SetOnOff(true);
-        }
-        if(onoff){
-          
-            setTimeout(()=>{
-              moreIncrease();
-              SetOnOff(false)
-            },1000)
-          
-        }
-      }) */
-  /* const lastCardRef = useRef(null); */
-  /* const infiniteScroll =useCallback(()=>{
-
-    if(window.innerHeight+window.scrollY >= document.body.offsetHeight-500){
-      if(isLoading0){
-        moreIncrease()
-      }
-    }
-  },[isLoading0])
-  window.addEventListener('scroll',()=>{
-    
-      infiniteScroll()
-    
-  },true) */
   return (
     <Wrapper>
       <ScrollBoxUp
@@ -750,13 +725,13 @@ function Movie() {
                 <MdAddCircle />
               </div>
             </ListText>
-            <select
-              defaultValue="영어"
+            <SelectBox
               onChange={(e) => languageHandler(e.target.value)}
+              defaultValue="Korean"
             >
-              <option value="한국어">한국어</option>
-              <option value="영어">영어</option>
-            </select>
+              <option value="Korean">Korean</option>
+              <option value="English">English</option>
+            </SelectBox>
             <FormWrapper onSubmit={handleSubmit(onValid)}>
               {/* <ListSearch
                 {...register("keyword")}
@@ -784,9 +759,12 @@ function Movie() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <motion.path
-                  initial={{pathLength:0, fill: "rgba(255,255,255,0)" }}
-                  animate={{pathLength:1, fill: "#886288" }}
-                  transition={{default:{duration:3},fill:{duration:0.5,delay:3}}}
+                  initial={{ pathLength: 0, fill: "rgba(255,255,255,0)" }}
+                  animate={{ pathLength: 1, fill: "#886288" }}
+                  transition={{
+                    default: { duration: 3 },
+                    fill: { duration: 0.5, delay: 3 },
+                  }}
                   fillRule="evenodd"
                   stroke="white"
                   d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
@@ -796,6 +774,7 @@ function Movie() {
             </FormWrapper>
           </ListMoreBtn>
         </AnimatePresence>
+        <Br/>
         <AnimatePresence onExitComplete={toggleLeaving}>
           <Row
             variants={rowVariants}

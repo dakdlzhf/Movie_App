@@ -3,6 +3,7 @@ import Movie from "./components/Movie";
 import Header from "./components/Header";
 import Tv from "./components/Tv";
 
+
 function App() {
   return (
     <Router>

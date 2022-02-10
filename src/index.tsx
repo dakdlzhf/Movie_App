@@ -3,9 +3,10 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import styled, { createGlobalStyle } from "styled-components";
 import { QueryClientProvider, QueryClient } from "react-query";
+import "./index.css";
 
 const GlobalStyle = createGlobalStyle`
-@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nanum+Pen+Script&display=swap');
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -37,8 +38,9 @@ footer, header, hgroup, main, menu, nav, section {
 }
 body {
   line-height: 1;
+  overflow-y:scroll; // 엘리먼트가 유무에따라 화면이 흔들릴때 스크롤바때문인데 아예나와있게만들면 흔들리지않는다
   overflow-x: hidden; //가로스크롤바 숨기기
-  overflow-y:hidden;  //세로스크롤바 숨기기 데이터검색할때 콘텐츠들이 생기고 없어질때 흔들림을 없애기위해
+  /* overflow-y:hidden; */  //세로스크롤바 숨기기 데이터검색할때 콘텐츠들이 생기고 없어질때 흔들림을 없애기위해
   background-color:black;
 }
 menu, ol, ul {
