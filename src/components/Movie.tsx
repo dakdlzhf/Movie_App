@@ -33,7 +33,7 @@ const Banner = styled.div`
   overflow: hidden;
 `;
 const BannerParent = styled(motion.div)`
-  margin-top: 100px;
+  margin-top: 50px;
   width: 1100vw;
   height: inherit;
   margin-bottom: 10px;
@@ -82,7 +82,7 @@ const BannerChildren = styled(motion.div)`
   animation-duration: 60s;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
-  animation-direction: alternate;
+  animation-direction: alternate; /* 방향전환 */
   padding: 50px;
 `;
 const ImageItem = styled(motion.div)<{ backgroundimage: string }>`
@@ -152,6 +152,7 @@ const Overview = styled.div`
 `;
 const Slider = styled.div`
   position: relative;
+  top: -30px;
 `;
 const MovieList = styled.div`
   position: relative;
@@ -179,7 +180,8 @@ const ListText = styled(motion.div)`
   width: 300px;
   height: 45px;
   border-radius: 20px;
-  background-color: white;
+  color: white;
+  background-color: #eb2f06;
   font-family: "Montserrat", sans-serif;
   cursor: pointer;
   div {
@@ -187,28 +189,35 @@ const ListText = styled(motion.div)`
     font-size: 2.5rem;
   }
 `;
-const MovieText = styled(motion.div)`
+const FirstTextWrapper = styled.div`
+  position: relative;
+  top: 0px;
+`;
+const InfoText = styled(motion.div)`
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   font-size: 30px;
   color: white;
-  margin: 10px 30px;
+  margin-top: 40px;
+  margin-left: 40px;
   font-family: "Montserrat", sans-serif;
   font-weight: bold;
 `;
-const SliderButton = styled(motion.div)`
-  width: 100px;
-  height: 30px;
+const NextButton = styled(motion.div)`
+  width: 150px;
+  height: 40px;
   border-radius: 20px;
-  font-size: 20px;
-  cursor: pointer;
+  font-size: 30px;
   background-color: rgb(25, 42, 86);
   margin-left: 30px;
   text-align: center;
+  div {
+    cursor: pointer;
+  }
 `;
 const Svg = styled.svg`
-  z-index: 1000;
+  z-index: 2100;
   position: fixed;
   top: 2%;
   right: 30px;
@@ -222,16 +231,18 @@ const Row = styled(motion.div)`
   gap: 10px;
   grid-template-columns: repeat(5, 1fr);
   margin-bottom: 5px;
+  margin-top:20px;
   padding: 40px;
+  
 `;
 
 const Col = styled(motion.div)<{ backgroundimage: string }>`
   width: 100%;
   height: 300px;
   background-position: center center;
-  background-size: 100% auto;
-  max-height: 100%;
-  max-width: 100%;
+  background-size: cover;
+  max-height: 90%;
+  max-width: 90%;
   margin: auto;
   background-repeat: no-repeat;
   background-image: url(${(props) => props.backgroundimage});
@@ -251,39 +262,26 @@ const ColShadow = styled(motion.div)`
   width: 100%;
   height: inherit;
   text-align: center;
-  overflow:hidden;
+  overflow: hidden;
   div {
-    width:100%;
-    height:100%;
-    background-color:rgba(0,0,0,0.7);
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
     margin-top: 300px;
-    padding:8px;
-    transition:margin-top 1s;
-    h3{
-      font-size:15px;
-      font-weight:bold;
+    padding: 8px;
+    transition: margin-top 1s;
+    h3 {
+      font-size: 15px;
+      font-weight: bold;
+      font-family: "Montserrat", sans-serif;
     }
   }
-  &:hover>div{
-    margin-top:220px;
-    color:white;
+  &:hover > div {
+    margin-top: 220px;
+    color: white;
   }
 `;
-const ColShadowVariants = {
-  hidden: {
-    y: 0,
-  },
-  visible: {
-    y: 80,
-  },
-  exit: {
-    y: 0,
-  },
-};
 
-const Br = styled.div`
-  height: 20px;
-`;
 const SecondSlide = styled(motion.div)`
   position: absolute;
   width: 100%;
@@ -295,8 +293,8 @@ const SecondSlide = styled(motion.div)`
   padding: 40px;
 `;
 const SecondTextWrapper = styled.div`
-  position: absolute;
-  top: 330px;
+  position: relative;
+  top: 350px;
 `;
 // 영화콘텐츠 클릭시 커지면서 나오는 디테일 창
 const DetailWrapperFixed = styled(motion.div)`
@@ -321,29 +319,34 @@ const DetailInnerAbsolute = styled(motion.div)`
 `;
 const DetailOverview = styled.div`
   width: 100%;
-  background-color: #3c40c6;
   text-align: center;
   padding: 20px;
-  font-family: "Black Han Sans", sans-serif;
+  font-family: "Roboto", sans-serif;
+  font-weight: bold;
   font-size: 20px;
+  word-spacing: 4px;
+  line-height: 150%;
   div {
     margin: 10px;
-    font-size: 1rem;
-    font-family: "Black Han Sans", sans-serif;
-    color: yellow;
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: "Montserrat", sans-serif;
+    color: #0c2461;
   }
 `;
 const DetailReleaseDate = styled.div`
   width: 100%;
   padding: 20px;
-  background-color: #0fbcf9;
   text-align: center;
+  font-family: "Montserrat", sans-serif;
 `;
 const DetailGrade = styled.div`
   width: 100%;
   padding: 20px;
   background-color: #ff3f34;
   text-align: center;
+  color: white;
+  font-family: "Montserrat", sans-serif;
 `;
 //비디오 예고편이 없는 아이템 에러처리 이미지
 const ErrorView = styled.div`
@@ -351,7 +354,7 @@ const ErrorView = styled.div`
   height: 500px;
   padding: 50px;
   color: white;
-  font-size: 40px;
+  font-size: 35px;
   text-align: center;
   background-image: url("https://www.wallpapertip.com/wmimgs/99-996631_alone-sad-cardboard-box.jpg");
   background-position: center, center;
@@ -387,10 +390,10 @@ const ScrollBoxUp = styled(motion.div)`
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-image: url("https://image.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148901163.jpg");
+  background-color: #eb2f06;
   background-size: cover;
   color: white;
-  z-index: 200;
+  z-index: 2100;
   cursor: pointer;
   text-align: center;
   line-height: 100px;
@@ -405,10 +408,10 @@ const ScrollBoxDown = styled(motion.div)`
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEy1zo32-IA-jqIp-O25fxSyzarItuvzJ3eQ&usqp=CAU");
+  background-color: #eb2f06;
   color: white;
   background-size: contain;
-  z-index: 200;
+  z-index: 2100;
   text-align: center;
   line-height: 100px;
   h3 {
@@ -417,7 +420,7 @@ const ScrollBoxDown = styled(motion.div)`
 `;
 // Select 박스
 const SelectBox = styled(motion.select)`
-  z-index: 1000;
+  z-index: 2100;
   position: fixed;
   top: 2%;
   right: 150px;
@@ -437,7 +440,7 @@ const SelectBox = styled(motion.select)`
 `;
 //더보기 박스
 const MoreBox = styled(motion.div)`
-  z-index: 200;
+  z-index: 2100;
   position: fixed;
   top: 92%;
   right: 260px;
@@ -446,12 +449,14 @@ const MoreBox = styled(motion.div)`
   line-height: 100px;
   text-align: center;
   border-radius: 20px;
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEy1zo32-IA-jqIp-O25fxSyzarItuvzJ3eQ&usqp=CAU");
+  background-color: #eb2f06;
   color: white;
   background-size: contain;
   cursor: pointer;
   h3 {
     font-size: 2.5rem;
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
   }
 `;
 //Variants
@@ -488,26 +493,17 @@ const scrollVariants = {
     },
   },
 };
-const movieMoreBtnVaraints = {
-  active: {
-    color: "red",
-    transition: {
-      type: "spring",
-      duration: 2,
-    },
-  },
-};
 
 const buttonVariants = {
   initial: {
     opacity: 1,
   },
   active: {
-    opacity: [0, 1, 0],
+    opacity: [0.5, 1, 0.5],
     transition: {
       type: "tween",
       repeat: Infinity,
-      duration: 2,
+      duration: 1,
     },
   },
 };
@@ -584,7 +580,7 @@ function Movie() {
     /*id값으로 해당 video 요청 로직  ------------------------*/
     const getVideoApi = async () => {
       return await fetch(
-        `https://api.themoviedb.org/3/movie/${objectId}?api_key=f354ee7cde587f576652e7979db2f24a&append_to_response=videos,images`
+        `https://api.themoviedb.org/3/movie/${objectId}?api_key=f354ee7cde587f576652e7979db2f24a&language=${language}&append_to_response=videos,images`
       ).then((res) => res.json());
     };
     await getVideoApi().then((res) => {
@@ -632,7 +628,7 @@ function Movie() {
   useEffect(() => {
     const getTopMovieFetch = () => {
       return fetch(
-        `${BASE_PATH}/movie/upcoming?api_key=${API_KEY}&language=ko-KR&append_to_response=videos,images`
+        `${BASE_PATH}/movie/upcoming?api_key=${API_KEY}&language=ko-KR&page=3`
       ).then((res) => res.json());
     };
     getTopMovieFetch().then((res) => {
@@ -776,17 +772,19 @@ function Movie() {
         <Title>{videoValue?.title || data?.results[0].title}</Title>
         <Overview>{videoValue?.overview || data?.results[0].overview}</Overview>
       </Banner>
-      <MovieText>
-        <h3>인기작품</h3>
-        <SliderButton
-          onClick={increaseIndex}
-          variants={buttonVariants}
-          initial="initial"
-          animate="active"
-        >
-          <p>Next ✔</p>
-        </SliderButton>
-      </MovieText>
+      <FirstTextWrapper>
+        <InfoText>
+          <h3>인기작품</h3>
+          <NextButton
+            onClick={increaseIndex}
+            variants={buttonVariants}
+            initial="initial"
+            animate="active"
+          >
+            <div onClick={increaseIndex}>Next ✔</div>
+          </NextButton>
+        </InfoText>
+      </FirstTextWrapper>
       <Slider>
         <AnimatePresence onExitComplete={toggleLeaving}>
           <Row
@@ -812,7 +810,7 @@ function Movie() {
                     <div>
                       <h3>제목 : {object.title}</h3>
                       <h3>출시일: {object.release_date}</h3>
-                      <h3>평점 : {object.vote_average}</h3>
+                      <h3>평점 : {object.vote_average}점</h3>
                     </div>
                   </ColShadow>
                 </Col>
@@ -832,13 +830,13 @@ function Movie() {
                   playing={true}
                   loop={true}
                   controls={true}
-                  /* muted */
+                  muted
                   width="100%"
                   height="500px"
                 />
               ) : (
                 <ErrorView>
-                  <h3>비공개처리되었습니다..😭</h3>
+                  <h4>한글지원영상이없습니다.ㅠ</h4>
                 </ErrorView>
               )}
 
@@ -846,13 +844,15 @@ function Movie() {
                 <>
                   <DetailOverview>
                     <div>{"영화제목 : " + videoValue.title}</div>
-                    {videoValue?.overview}
+                    {videoValue.overview}
                   </DetailOverview>
                   <DetailReleaseDate>
                     {"영화개봉일 : " + videoValue.release_date}
                   </DetailReleaseDate>
                   <DetailGrade>
-                    {"영화평점 : " + videoValue.vote_average}
+                    {"영화평점 : " + videoValue.vote_average == "0"
+                      ? videoValue.vote_average
+                      : "아직평점이없습니다."}
                   </DetailGrade>
                 </>
               )}
@@ -863,17 +863,17 @@ function Movie() {
 
       <Slider>
         <SecondTextWrapper>
-          <MovieText>
+          <InfoText>
             <h3>개봉예정작품</h3>
-            <SliderButton
+            <NextButton
               onClick={secondincreaseIndex}
               variants={buttonVariants}
               initial="initial"
               animate="active"
             >
-              <p>Next ✔</p>
-            </SliderButton>
-          </MovieText>
+              <div>Next ✔</div>
+            </NextButton>
+          </InfoText>
         </SecondTextWrapper>
         <AnimatePresence onExitComplete={secondToggleLeaving}>
           <SecondSlide
@@ -894,7 +894,15 @@ function Movie() {
                   whileHover="hover"
                   key={object.id}
                   backgroundimage={makeImagePath(object.poster_path)}
-                ></Col>
+                >
+                  <ColShadow>
+                    <div>
+                      <h3>제목 : {object.title}</h3>
+                      <h3>출시일: {object.release_date}</h3>
+                      <h3>평점 : {object.vote_average}점</h3>
+                    </div>
+                  </ColShadow>
+                </Col>
               ))}
           </SecondSlide>
         </AnimatePresence>
@@ -903,11 +911,7 @@ function Movie() {
       <MovieList>
         <AnimatePresence>
           <ListMoreBtn>
-            <ListText
-              variants={movieMoreBtnVaraints}
-              whileHover="active"
-              onClick={moreToggleBtn}
-            >
+            <ListText onClick={moreToggleBtn}>
               영화더보기
               <div>
                 <MdAddCircle />
@@ -956,7 +960,6 @@ function Movie() {
             </FormWrapper>
           </ListMoreBtn>
         </AnimatePresence>
-        <Br />
         <AnimatePresence onExitComplete={toggleLeaving}>
           <Row
             variants={rowVariants}
@@ -987,7 +990,15 @@ function Movie() {
                         object.poster_path,
                         "w500"
                       )}
-                    ></Col>
+                    >
+                      <ColShadow>
+                        <div>
+                          <h3>제목 : {object.title}</h3>
+                          <h3>출시일: {object.release_date}</h3>
+                          <h3>평점 : {object.vote_average}점</h3>
+                        </div>
+                      </ColShadow>
+                    </Col>
                   ))
               : null}
             {/* <div ref={lastCardRef} /> */}
