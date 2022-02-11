@@ -1,6 +1,6 @@
 /* @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nanum+Pen+Script&display=swap'); */
 import { useQuery } from "react-query";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
 import { MdAddCircle } from "react-icons/md";
 import {
@@ -33,18 +33,55 @@ const Banner = styled.div`
   overflow: hidden;
 `;
 const BannerParent = styled(motion.div)`
-  width: 2000vw;
+  width: 1100vw;
   height: inherit;
   margin-bottom: 5px;
   background-color: #1e272efb;
 `;
+const keyframeSlide = keyframes`
+    0%{transform:translateX(0)}
+    9%{transform:translateX(0)}
+    10%{transform:translateX(-100vw)}
+
+    19%{transform:translateX(-100vw)}
+    20%{transform:translateX(-200vw)}
+
+    29%{transform:translateX(-200vw)}
+    30%{transform:translateX(-300vw)}
+
+    39%{transform:translateX(-300vw)}
+    40%{transform:translateX(-400vw)}
+
+    49%{transform:translateX(-400vw)}
+    50%{transform:translateX(-500vw)}
+
+    59%{transform:translateX(-500vw)}
+    60%{transform:translateX(-600vw)}
+
+    69%{transform:translateX(-600vw)}
+    70%{transform:translateX(-700vw)}
+
+    79%{transform:translateX(-700vw)}
+    80%{transform:translateX(-800vw)}
+
+    89%{transform:translateX(-800vw)}
+    90%{transform:translateX(-900vw)}
+
+    99%{transform:translateX(-900vw)}
+    100%{transform:translateX(-900vw)}
+
+`;
+
 const BannerChildren = styled(motion.div)`
   float: left;
   display: flex;
   width: 100vw;
   height: inherit;
-  transform:translateX(-700vw);
-  transition:transform 1s;
+  animation-name: ${keyframeSlide};
+  animation-duration: 60s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-direction: alternate;
 `;
 const ImageItem = styled(motion.div)<{ backgroundimage: string }>`
   width: 60%;
@@ -65,25 +102,25 @@ const TextItem = styled(motion.div)`
 `;
 const InnerTitle = styled(motion.h2)`
   font-family: "Montserrat", sans-serif;
-  font-size:3rem;
+  font-size: 3rem;
   font-weight: bold;
-  margin-bottom:20px;
+  margin-bottom: 20px;
 `;
 const InnerOverview = styled(motion.span)`
   font-family: "Montserrat", sans-serif;
-  font-size:20px;
+  font-size: 20px;
 `;
 const InnerButton = styled(motion.button)`
-  width:100px;
-  height:50px;
-  border:none;
-  border-radius:10px;
-  font-size:20px;
-  margin-top:20px;
-  cursor:pointer;
-  &:hover{
-    transform:scale(1.1);
-    transition:transform 1s;
+  width: 100px;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  font-size: 20px;
+  margin-top: 20px;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.1);
+    transition: transform 1s;
   }
 `;
 
@@ -163,6 +200,10 @@ const SliderButton = styled(motion.div)`
   text-align: center;
 `;
 const Svg = styled.svg`
+z-index:1000;
+position:fixed;
+top:2%;
+right:30px;
   width: 100px;
   height: 100px;
 `;
@@ -323,11 +364,15 @@ const ScrollBoxDown = styled(motion.div)`
 `;
 // Select 박스
 const SelectBox = styled(motion.select)`
+  z-index: 1000;
+  position: fixed;
+  top: 2%;
+  right: 150px;
   border: none;
   border-radius: 10px;
-  width: 10%;
+  width: 15%;
   text-align: center;
-  font-size: 23px;
+  font-size: 28px;
   margin-left: 20px;
   font-family: "Montserrat", sans-serif;
   font-weight: bold;
@@ -446,6 +491,7 @@ function Movie() {
   const [isLoading0, setIsLoading0] = useState<boolean>(true);
   const [moreCount, setMoreCount] = useState(3);
   const inputAnimation = useAnimation();
+  const BannerAnimation = useAnimation();
   const [searchClick, setSearchClick] = useState(false);
   const toggleHandle = () => {
     if (searchClick) {
@@ -624,6 +670,15 @@ function Movie() {
           <AiOutlineArrowDown />
         </h3>
       </ScrollBoxDown>
+
+      <SelectBox
+        onChange={(e) => languageHandler(e.target.value)}
+        defaultValue="Korean"
+      >
+        <option value="Korean">Korean</option>
+        <option value="English">English</option>
+      </SelectBox>
+
       {scrollSwitch /* 스크롤 값 조건에 따라 버튼이보인다 */ ? (
         <MoreBox
           onClick={moreToggleBtn}
@@ -635,25 +690,32 @@ function Movie() {
         </MoreBox>
       ) : null}
 
-      <Banner
-      /* backgroundimage={makeImagePath(
-          videoValue?.backdrop_path || data?.results[0].poster_path || ""
-        )} */
-      >
-        <BannerParent>
-          {filterTest?.map((el) => (
-            <BannerChildren onClick={() => onClick(el.id)} key={el.id}>
-              <ImageItem
-                backgroundimage={makeImagePath(el.poster_path || "")}
-              />
-              <TextItem>
-                <InnerTitle>{el.title}</InnerTitle>
-                <InnerOverview>{el.overview}</InnerOverview>
-                <InnerButton>재생하기</InnerButton>
-              </TextItem>
-            </BannerChildren>
-          ))}
-        </BannerParent>
+      <Banner>
+        <AnimatePresence>
+          <BannerParent>
+            {filterTest?.slice(6, 16).map((el) => (
+              <BannerChildren
+                key={el.id}
+                /* variants={BannerVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ duration: 0.7 }} */
+              >
+                <ImageItem
+                  backgroundimage={makeImagePath(el.poster_path || "")}
+                />
+                <TextItem>
+                  <InnerTitle>{el.title}</InnerTitle>
+                  <InnerOverview>{el.overview}</InnerOverview>
+                  <InnerButton onClick={() => onClick(el.id)}>
+                    예고편
+                  </InnerButton>
+                </TextItem>
+              </BannerChildren>
+            ))}
+          </BannerParent>
+        </AnimatePresence>
 
         {isLoading ? <Loder>😑Loding...</Loder> : null}
         <Title>{videoValue?.title || data?.results[0].title}</Title>
@@ -788,13 +850,7 @@ function Movie() {
                 <MdAddCircle />
               </div>
             </ListText>
-            <SelectBox
-              onChange={(e) => languageHandler(e.target.value)}
-              defaultValue="Korean"
-            >
-              <option value="Korean">Korean</option>
-              <option value="English">English</option>
-            </SelectBox>
+
             <FormWrapper onSubmit={handleSubmit(onValid)}>
               {/* <ListSearch
                 {...register("keyword")}
