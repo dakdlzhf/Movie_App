@@ -27,16 +27,66 @@ import _ from "lodash";
 const Wrapper = styled.div`
   height: 100vh;
 `;
-const Banner = styled.div<{ backgroundimage: string }>`
+const Banner = styled.div`
   height: 800px;
+  background-color: white;
+  overflow: hidden;
+`;
+const BannerParent = styled(motion.div)`
+  width: 2000vw;
+  height: inherit;
+  margin-bottom: 5px;
+  background-color: #1e272efb;
+`;
+const BannerChildren = styled(motion.div)`
+  float: left;
+  display: flex;
+  width: 100vw;
+  height: inherit;
+  transform:translateX(-700vw);
+  transition:transform 1s;
+`;
+const ImageItem = styled(motion.div)<{ backgroundimage: string }>`
+  width: 60%;
+  height: inherit;
+  background-image: url(${(props) => props.backgroundimage});
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+`;
+const TextItem = styled(motion.div)`
+  width: 40%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8)),
-    url(${(props) => props.backgroundimage});
-  background-size: cover;
-  padding: 40px;
+  align-items: center;
+  padding: 50px;
+  color: white;
 `;
+const InnerTitle = styled(motion.h2)`
+  font-family: "Montserrat", sans-serif;
+  font-size:3rem;
+  font-weight: bold;
+  margin-bottom:20px;
+`;
+const InnerOverview = styled(motion.span)`
+  font-family: "Montserrat", sans-serif;
+  font-size:20px;
+`;
+const InnerButton = styled(motion.button)`
+  width:100px;
+  height:50px;
+  border:none;
+  border-radius:10px;
+  font-size:20px;
+  margin-top:20px;
+  cursor:pointer;
+  &:hover{
+    transform:scale(1.1);
+    transition:transform 1s;
+  }
+`;
+
 const Loder = styled.div`
   height: 20vh;
   display: flex;
@@ -138,8 +188,8 @@ const Col = styled(motion.div)<{ backgroundimage: string }>`
     transform-origin: center right;
   }
 `;
-const Br =styled.div`
-  height:20px;
+const Br = styled.div`
+  height: 20px;
 `;
 const SecondSlide = styled(motion.div)`
   position: absolute;
@@ -281,10 +331,10 @@ const SelectBox = styled(motion.select)`
   margin-left: 20px;
   font-family: "Montserrat", sans-serif;
   font-weight: bold;
-  option{
+  option {
     font-family: "Montserrat", sans-serif;
-    font-size:18px;
-  font-weight: bold;
+    font-size: 18px;
+    font-weight: bold;
   }
 `;
 //더보기 박스
@@ -451,7 +501,7 @@ function Movie() {
   const [test, setTest] = useState<IGetListApi[]>();
   const [btnSwitch, setBtnSwitch] = useState(false);
   const [language, setLanguage] = useState("ko-KR");
-  useEffect(() => { 
+  useEffect(() => {
     /* MORE 클릭시 List api 요청 + count 증가 로직 -----------------------------------------------------*/
     for (var i = 2; i < moreCount; i++) {
       let apiGet1 = () => {
@@ -505,9 +555,7 @@ function Movie() {
       }) === index
     );
   });
-  
 
-  
   const increaseIndex = () => {
     /* 첫번째슬라이드 index값증가에따라 슬라이드 key값변경해서 재랜더링 함 */
     if (data) {
@@ -588,10 +636,25 @@ function Movie() {
       ) : null}
 
       <Banner
-        backgroundimage={makeImagePath(
+      /* backgroundimage={makeImagePath(
           videoValue?.backdrop_path || data?.results[0].poster_path || ""
-        )}
+        )} */
       >
+        <BannerParent>
+          {filterTest?.map((el) => (
+            <BannerChildren onClick={() => onClick(el.id)} key={el.id}>
+              <ImageItem
+                backgroundimage={makeImagePath(el.poster_path || "")}
+              />
+              <TextItem>
+                <InnerTitle>{el.title}</InnerTitle>
+                <InnerOverview>{el.overview}</InnerOverview>
+                <InnerButton>재생하기</InnerButton>
+              </TextItem>
+            </BannerChildren>
+          ))}
+        </BannerParent>
+
         {isLoading ? <Loder>😑Loding...</Loder> : null}
         <Title>{videoValue?.title || data?.results[0].title}</Title>
         <Overview>{videoValue?.overview || data?.results[0].overview}</Overview>
@@ -774,7 +837,7 @@ function Movie() {
             </FormWrapper>
           </ListMoreBtn>
         </AnimatePresence>
-        <Br/>
+        <Br />
         <AnimatePresence onExitComplete={toggleLeaving}>
           <Row
             variants={rowVariants}
