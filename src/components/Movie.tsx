@@ -28,15 +28,16 @@ const Wrapper = styled.div`
   height: 100vh;
 `;
 const Banner = styled.div`
-  height: 800px;
+  height: 1000px;
   background-color: white;
   overflow: hidden;
 `;
 const BannerParent = styled(motion.div)`
+  margin-top: 100px;
   width: 1100vw;
   height: inherit;
-  margin-bottom: 5px;
-  background-color: #1e272efb;
+  margin-bottom: 10px;
+  background-color: black;
 `;
 const keyframeSlide = keyframes`
     0%{transform:translateX(0)}
@@ -82,14 +83,18 @@ const BannerChildren = styled(motion.div)`
   animation-iteration-count: infinite;
   animation-timing-function: linear;
   animation-direction: alternate;
+  padding: 50px;
 `;
 const ImageItem = styled(motion.div)<{ backgroundimage: string }>`
   width: 60%;
   height: inherit;
   background-image: url(${(props) => props.backgroundimage});
   background-position: center center;
-  background-size: contain;
+  background-size: 100% auto;
+  max-height: 100%;
+  max-width: 100%;
   background-repeat: no-repeat;
+  overflow: hidden;
 `;
 const TextItem = styled(motion.div)`
   width: 40%;
@@ -97,7 +102,9 @@ const TextItem = styled(motion.div)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 50px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 30px;
   color: white;
 `;
 const InnerTitle = styled(motion.h2)`
@@ -163,6 +170,7 @@ const ListMoreBtn = styled(motion.div)`
   height: 45px;
   border-radius: 5px;
   font-size: 30px;
+  margin-top:100px;
 `;
 const ListText = styled(motion.div)`
   display: flex;
@@ -200,10 +208,10 @@ const SliderButton = styled(motion.div)`
   text-align: center;
 `;
 const Svg = styled.svg`
-z-index:1000;
-position:fixed;
-top:2%;
-right:30px;
+  z-index: 1000;
+  position: fixed;
+  top: 2%;
+  right: 30px;
   width: 100px;
   height: 100px;
 `;
@@ -214,21 +222,65 @@ const Row = styled(motion.div)`
   gap: 10px;
   grid-template-columns: repeat(5, 1fr);
   margin-bottom: 5px;
+  padding: 40px;
 `;
+
 const Col = styled(motion.div)<{ backgroundimage: string }>`
+  width: 100%;
   height: 300px;
   background-position: center center;
-  background-size: cover;
+  background-size: 100% auto;
+  max-height: 100%;
+  max-width: 100%;
+  margin: auto;
+  background-repeat: no-repeat;
   background-image: url(${(props) => props.backgroundimage});
-  background-color: blue;
-  border-radius: 20px;
+  position: relative;
   &:first-child {
     transform-origin: center left;
   }
   &:last-child {
     transform-origin: center right;
   }
+  &:hover {
+    z-index: 2000;
+  }
 `;
+const ColShadow = styled(motion.div)`
+  position: absolute;
+  width: 100%;
+  height: inherit;
+  text-align: center;
+  overflow:hidden;
+  div {
+    width:100%;
+    height:100%;
+    background-color:rgba(0,0,0,0.7);
+    margin-top: 300px;
+    padding:8px;
+    transition:margin-top 1s;
+    h3{
+      font-size:15px;
+      font-weight:bold;
+    }
+  }
+  &:hover>div{
+    margin-top:220px;
+    color:white;
+  }
+`;
+const ColShadowVariants = {
+  hidden: {
+    y: 0,
+  },
+  visible: {
+    y: 80,
+  },
+  exit: {
+    y: 0,
+  },
+};
+
 const Br = styled.div`
   height: 20px;
 `;
@@ -239,11 +291,12 @@ const SecondSlide = styled(motion.div)`
   gap: 10px;
   grid-template-columns: repeat(5, 1fr);
   margin-bottom: 5px;
-  top: 350px;
+  top: 400px;
+  padding: 40px;
 `;
 const SecondTextWrapper = styled.div`
   position: absolute;
-  top: 300px;
+  top: 330px;
 `;
 // 영화콘텐츠 클릭시 커지면서 나오는 디테일 창
 const DetailWrapperFixed = styled(motion.div)`
@@ -307,7 +360,7 @@ const ErrorView = styled.div`
 // 검색 박스
 const SearchBox = styled(motion.input)`
   position: fixed;
-  z-index: 200;
+  z-index: 1000;
   right: 30px;
   top: 88.5%;
   border: none;
@@ -460,13 +513,13 @@ const buttonVariants = {
 };
 const colVariants = {
   normal: {
-    scale: 1,
+    scale: 0.7,
   },
   hover: {
-    scale: 1.3,
+    scale: 1.2,
     y: -50,
     transition: {
-      delay: 0.3,
+      delay: 0.2,
       duration: 0.3,
       type: "tween",
     },
@@ -693,7 +746,7 @@ function Movie() {
       <Banner>
         <AnimatePresence>
           <BannerParent>
-            {filterTest?.slice(6, 16).map((el) => (
+            {filterTest?.slice(3, 13).map((el) => (
               <BannerChildren
                 key={el.id}
                 /* variants={BannerVariants}
@@ -707,7 +760,9 @@ function Movie() {
                 />
                 <TextItem>
                   <InnerTitle>{el.title}</InnerTitle>
-                  <InnerOverview>{el.overview}</InnerOverview>
+                  <InnerOverview>
+                    {el.overview ? el.overview : "한글소개를지원하지않습니다."}
+                  </InnerOverview>
                   <InnerButton onClick={() => onClick(el.id)}>
                     예고편
                   </InnerButton>
@@ -751,8 +806,16 @@ function Movie() {
                   initial="nomal"
                   whileHover="hover"
                   key={object.id}
-                  backgroundimage={makeImagePath(object.poster_path, "w500")}
-                ></Col>
+                  backgroundimage={makeImagePath(object.poster_path)}
+                >
+                  <ColShadow>
+                    <div>
+                      <h3>제목 : {object.title}</h3>
+                      <h3>출시일: {object.release_date}</h3>
+                      <h3>평점 : {object.vote_average}</h3>
+                    </div>
+                  </ColShadow>
+                </Col>
               ))}
           </Row>
         </AnimatePresence>
@@ -830,7 +893,7 @@ function Movie() {
                   initial="nomal"
                   whileHover="hover"
                   key={object.id}
-                  backgroundimage={makeImagePath(object.poster_path, "w500")}
+                  backgroundimage={makeImagePath(object.poster_path)}
                 ></Col>
               ))}
           </SecondSlide>
