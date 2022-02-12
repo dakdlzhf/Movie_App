@@ -14,23 +14,19 @@ const HeaderWrapper = styled(motion.div)`
   margin:0 auto;
   font-size: 20px;
   color: white;
-  justify-content: space-between;
   align-items: center;
   width: 100%;
   height: 100px;
   padding: 20px 60px;
 `;
 const Col = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   padding: 20px;
 `;
 const Logo = styled(motion.svg)`
   margin-right: 50px;
   width: 120px;
-  min-width: 100px;
+  min-width: 5vw;
   height: 70px;
   fill: red;
   path {

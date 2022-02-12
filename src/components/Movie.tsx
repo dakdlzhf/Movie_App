@@ -2,6 +2,7 @@
 import { useQuery } from "react-query";
 import styled, { keyframes } from "styled-components";
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
+import {CgArrowUpR,CgArrowDownR} from 'react-icons/cg'
 import { MdAddCircle } from "react-icons/md";
 import {
   API_KEY,
@@ -101,7 +102,6 @@ const TextItem = styled(motion.div)`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   margin-left: 10px;
   margin-right: 10px;
   padding: 30px;
@@ -109,14 +109,20 @@ const TextItem = styled(motion.div)`
 `;
 const InnerTitle = styled(motion.h2)`
   font-family: "Montserrat", sans-serif;
-  font-size: 3rem;
+  font-size: 5vw;
   font-weight: bold;
   margin-bottom: 20px;
 `;
-const InnerOverview = styled(motion.span)`
+const InnerOverview = styled(motion.div)`
   font-family: "Montserrat", sans-serif;
-  font-size: 20px;
+  font-size: 2vw;
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
+  line-height: 1.8;
+  overflow: hidden;
 `;
+
 const InnerButton = styled(motion.button)`
   width: 100px;
   height: 50px;
@@ -162,16 +168,16 @@ const MovieList = styled.div`
 const ListMoreBtn = styled(motion.div)`
   display: flex;
   justify-content: center;
-  align-items: center
+  align-items: center;
   margin-bottom: 10px;
   text-align: center;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: bold;
   width: 100%;
   height: 45px;
   border-radius: 5px;
   font-size: 30px;
-  margin-top:100px;
+  margin-top: 100px;
 `;
 const ListText = styled(motion.div)`
   display: flex;
@@ -219,7 +225,7 @@ const NextButton = styled(motion.div)`
 const Svg = styled.svg`
   z-index: 2100;
   position: fixed;
-  top: 2%;
+  top: 28px;
   right: 30px;
   width: 100px;
   height: 100px;
@@ -231,9 +237,8 @@ const Row = styled(motion.div)`
   gap: 10px;
   grid-template-columns: repeat(5, 1fr);
   margin-bottom: 5px;
-  margin-top:20px;
+  margin-top: 20px;
   padding: 40px;
-  
 `;
 
 const Col = styled(motion.div)<{ backgroundimage: string }>`
@@ -319,13 +324,15 @@ const DetailInnerAbsolute = styled(motion.div)`
 `;
 const DetailOverview = styled.div`
   width: 100%;
+  height: 300px;
   text-align: center;
   padding: 20px;
   font-family: "Roboto", sans-serif;
   font-weight: bold;
   font-size: 20px;
   word-spacing: 4px;
-  line-height: 150%;
+  line-height: 1.5;
+  overflow: scroll;
   div {
     margin: 10px;
     font-size: 2rem;
@@ -390,15 +397,13 @@ const ScrollBoxUp = styled(motion.div)`
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-color: #eb2f06;
-  background-size: cover;
   color: white;
   z-index: 2100;
   cursor: pointer;
   text-align: center;
   line-height: 100px;
   h3 {
-    font-size: 4rem;
+    font-size: 5rem;
   }
 `;
 const ScrollBoxDown = styled(motion.div)`
@@ -408,21 +413,19 @@ const ScrollBoxDown = styled(motion.div)`
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-color: #eb2f06;
   color: white;
-  background-size: contain;
   z-index: 2100;
   text-align: center;
   line-height: 100px;
   h3 {
-    font-size: 4rem;
+    font-size: 5rem;
   }
 `;
 // Select 박스
 const SelectBox = styled(motion.select)`
   z-index: 2100;
   position: fixed;
-  top: 2%;
+  top: 30px;
   right: 150px;
   border: none;
   border-radius: 10px;
@@ -706,19 +709,20 @@ function Movie() {
         onClick={topMoveHandler}
       >
         <h3>
-          <AiOutlineArrowUp />
+          <CgArrowUpR/>
         </h3>
       </ScrollBoxUp>
-      <ScrollBoxDown
+      {document.body.scrollHeight-500>window.innerHeight? <ScrollBoxDown
         variants={scrollVariants}
         whileHover="active"
         initial={{ scale: 0.7 }}
         onClick={BottomMoveHandler}
       >
         <h3>
-          <AiOutlineArrowDown />
+          <CgArrowDownR/>
         </h3>
-      </ScrollBoxDown>
+      </ScrollBoxDown>:null}
+     
 
       <SelectBox
         onChange={(e) => languageHandler(e.target.value)}
