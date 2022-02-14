@@ -29,7 +29,7 @@ const Wrapper = styled.div`
   height: 100vh;
 `;
 const Banner = styled.div`
-  height: 1000px;
+  height:1000px;
   background-color: white;
   overflow: hidden;
 `;
@@ -226,9 +226,9 @@ const Svg = styled.svg`
   z-index: 2100;
   position: fixed;
   top: 28px;
-  right: 30px;
-  width: 100px;
-  height: 100px;
+  right: 5%;
+  width: 10%;
+  height: 10%;
 `;
 const Row = styled(motion.div)`
   position: absolute;
@@ -313,14 +313,14 @@ const DetailWrapperFixed = styled(motion.div)`
 `;
 const DetailInnerAbsolute = styled(motion.div)`
   position: absolute;
-  width: 50%;
+  width: 70%;
   left: 0;
   right: 0;
   margin: 0 auto;
   border-radius: 20px;
   background-color: white;
   overflow: hidden;
-  z-index: 100;
+  z-index: 3000;
 `;
 const DetailOverview = styled.div`
   width: 100%;
@@ -392,7 +392,7 @@ const FormWrapper = styled.form`
 // 스크롤 박스 Up,Down
 const ScrollBoxUp = styled(motion.div)`
   position: fixed;
-  top: 92%;
+  top: 90%;
   right: 20px;
   width: 100px;
   height: 100px;
@@ -408,7 +408,7 @@ const ScrollBoxUp = styled(motion.div)`
 `;
 const ScrollBoxDown = styled(motion.div)`
   position: fixed;
-  top: 92%;
+  top: 90%;
   right: 150px;
   width: 100px;
   height: 100px;
@@ -426,7 +426,7 @@ const SelectBox = styled(motion.select)`
   z-index: 2100;
   position: fixed;
   top: 30px;
-  right: 150px;
+  right: 15%;
   border: none;
   border-radius: 10px;
   width: 15%;
@@ -445,7 +445,7 @@ const SelectBox = styled(motion.select)`
 const MoreBox = styled(motion.div)`
   z-index: 2100;
   position: fixed;
-  top: 92%;
+  top: 90%;
   right: 260px;
   width: 150px;
   height: 100px;
