@@ -12,9 +12,9 @@
   * Styled-compotnents
   * Framer-motion 
 ### 주요기능
-  1.영화에대한정보를보
-  2.예고편을볼수있는 비디오가 재생
-  3.영화검색
+  * 영화에대한정보를보
+  * 예고편을볼수있는 비디오가 재생
+  * 영화검색
   
 ![movie1](https://user-images.githubusercontent.com/80139780/155116026-37004d4c-727c-4e69-8d00-b201ac9e4a79.gif)
 
